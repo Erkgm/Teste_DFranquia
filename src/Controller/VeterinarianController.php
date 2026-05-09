@@ -57,11 +57,11 @@ class VeterinarianController extends AbstractController
 
         if($form -> isSubmitted() && $form -> isValid()){
             $em -> flush();
-            $this.$this->addFlash('success', 'Veterinário atualizado');
+            $this->addFlash('success', 'Veterinário atualizado');
             return $this ->redirectToRoute('veterinarian_index');
         }
 
-        return $this -> render('veterinarian/index.html.twig', [
+        return $this -> render('veterinarian/form.html.twig', [
             'form' => $form,
             'title' => 'Editar Veterinário',
             'vet' => $vet,
@@ -71,7 +71,7 @@ class VeterinarianController extends AbstractController
     #[Route('/{id}/excluir', name: 'delete', methods: ['POST'])]
     public function delete(Veterinarian $vet, Request $request, EntityManagerInterface $em) : Response
     {
-        if($this -> isCsrfTokenValid('delte-vet-' . $vet -> getId(), $request -> request -> get('_token'))) {
+        if($this -> isCsrfTokenValid('delete-vet-' . $vet -> getId(), $request -> request -> get('_token'))) {
             $em -> remove($vet);
             $em -> flush();
             $this -> addFlash('success', 'Veterinário excluído');

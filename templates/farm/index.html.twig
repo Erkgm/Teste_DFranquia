@@ -1,20 +1,58 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello FarmController!{% endblock %}
+{% block title %}Fazendas{% endblock %}
 
 {% block body %}
-<style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
-</style>
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Fazendas</h2>
+            <a href="{{ path('farm_new') }}" class="btn btn-success">
+                + Nova Fazenda
+            </a>
+        </div>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+        <table class="table table-bordered table-hover">
+            <thead class="table-dark">
+            <tr>
+                <th>Nome</th>
+                <th>Tamanho (ha)</th>
+                <th>Responsável</th>
+                <th>Veterinários</th>
+                <th>Ações</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for farm in pagination %}
+                <tr>
+                    <td>{{ farm.name }}</td>
+                    <td>{{ farm.tamanho }}</td>
+                    <td>{{ farm.responsavel }}</td>
+                    <td>
+                        {% for vet in farm.veterinarios %}
+                            <span class="badge bg-success">{{ vet.name }}</span>
+                        {% else %}
+                            <span class="text-muted">Nenhum</span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <a href="{{ path('farm_edit', {id: farm.id}) }}" class="btn btn-sm btn-warning">Editar</a>
+                        <form method="post" action="{{ path('farm_delete', {id: farm.id}) }}" class="d-inline"
+                              onsubmit="return confirm('Confirmar a exclusão')">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete-farm-' ~ farm.id) }}">
+                            <button class="btn btn-sm btn-danger">Excluir</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">Nenhuma fazenda cadastrada.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/yeric/IdeaProjects/teste_DFranquia/src/Controller/FarmController.php</code></li>
-        <li>Your template at <code>C:/Users/yeric/IdeaProjects/teste_DFranquia/templates/farm/index.html.twig</code></li>
-    </ul>
-</div>
+        <div class="d-flex justify-content-center">
+            {{ knp_pagination_render(pagination) }}
+        </div>
+    </div>
 {% endblock %}
