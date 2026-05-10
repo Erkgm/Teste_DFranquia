@@ -62,7 +62,7 @@ class FarmController extends AbstractController
         }
 
         return $this -> render('farm/form.html.twig', [
-            'form' => 'form',
+            'form' => $form,
             'title' => 'Editar fazenda',
             'farm' => $farm,
     ]);
@@ -71,7 +71,7 @@ class FarmController extends AbstractController
     #[Route('/{id}/excluir', name: 'delete', methods: ['POST'])]
     public function delete(Farm $farm, Request $request, EntityManagerInterface $em): Response
     {
-        if($this -> isCsrfTokenValid('delete-vet' . $farm -> getId(), $request -> get('_token'))) {
+        if($this -> isCsrfTokenValid('delete-farm-' . $farm -> getId(), $request -> get('_token'))) {
             $em -> remove($farm);
             $em -> flush();
             $this -> addFlash('success', 'Fazenda excluída');

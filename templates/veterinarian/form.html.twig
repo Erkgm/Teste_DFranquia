@@ -11,7 +11,7 @@
                         <h4>{{ title }}</h4>
                     </div>
                     <div class="card-body">
-                        {{ form_start(form, {'action': path('veterinarian_new'), 'method': 'POST'}) }}
+                        {{ form_start(form, {'action': vet is defined ? path('veterinarian_edit', {id: vet.id}) : path('veterinarian_new'), 'method': 'POST'}) }}
                         <div class="mb-3">
                             {{ form_label(form.name) }}
                             {{ form_widget(form.name) }}
