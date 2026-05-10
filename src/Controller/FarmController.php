@@ -18,7 +18,7 @@ class FarmController extends AbstractController
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(FarmRepository $repo, PaginatorInterface $paginator, Request $request): Response
     {
-        $query = $repo->createQueryBuilder('f')
+        $query = $repo -> createQueryBuilder('f')
             ->orderBy('f.name', 'ASC')
             ->getQuery();
 
