@@ -1,0 +1,48 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Relatório de Abatidos{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2>Relatório de Animais Abatidos</h2>
+            <span class="badge bg-secondary fs-6">{{ animais|length }} registros</span>
+        </div>
+
+        {% if animais|length == 0 %}
+            <div class="alert alert-info">
+                Nenhum animal foi abatido
+            </div>
+        {% else %}
+            <table class="table table-bordered table-hover">
+                <thead class="table-dark">
+                <tr>
+                    <th>Código</th>
+                    <th>Fazenda</th>
+                    <th>Nascimento</th>
+                    <th>Leite (L/sem)</th>
+                    <th>Ração (kg/sem)</th>
+                    <th>Peso (kg)</th>
+                    <th>Data do Abate</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for animal in animais %}
+                    <tr>
+                        <td><span class="badge bg-secondary">{{ animal.codigo }}</span></td>
+                        <td>{{ animal.fazenda.name }}</td>
+                        <td>{{ animal.dataNascimento|date('d/m/Y') }}</td>
+                        <td>{{ animal.litrosLeitePorSemana }}</td>
+                        <td>{{ animal.racaoPorSemana }}</td>
+                        <td>
+                            {{ animal.peso }} kg
+                            <small class="text-muted">({{ animal.pesoEmArrobas|number_format(2, ',', '.') }})</small>
+                        </td>
+                        <td>{{ animal.abatidoEm ? animal.abatidoEm|date('d/m/Y H:i') : '-' }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+    </div>
+{% endblock %}

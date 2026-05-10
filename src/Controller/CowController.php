@@ -148,7 +148,7 @@ class CowController extends AbstractController
         }
 
         $cow->setAbatido(true);
-        $cow->setAbatidoEm(new \DateTime());
+        $cow->setAbatidoEm(new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')));
         $em -> flush();
         $this->addFlash('success', "Animal \" {$cow->getCodigo()}\"enviado para abate");
         return $this->redirectToRoute('cow_slaughter_list');
