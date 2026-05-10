@@ -25,15 +25,9 @@ class Farm
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     private ?string $tamanho = null;
 
-    /**
-     * @var Collection<int, Veterinarian>
-     */
     #[ORM\ManyToMany(targetEntity: Veterinarian::class, inversedBy: 'farms')]
     private Collection $veterinarios;
 
-    /**
-     * @var Collection<int, Cow>
-     */
     #[ORM\OneToMany(targetEntity: Cow::class, mappedBy: 'fazenda')]
     private Collection $cows;
 
@@ -84,9 +78,6 @@ class Farm
         return $this;
     }
 
-    /**
-     * @return Collection<int, Veterinarian>
-     */
     public function getVeterinarios(): Collection
     {
         return $this->veterinarios;
@@ -108,9 +99,6 @@ class Farm
         return $this;
     }
 
-    /**
-     * @return Collection<int, Cow>
-     */
     public function getCows(): Collection
     {
         return $this->cows;
@@ -136,5 +124,26 @@ class Farm
         }
 
         return $this;
+    }
+
+
+    //Regra de quantidade de animal e vivo
+    public function getTamanhoFloat(): float{
+        return (float) $this->tamanho;
+    }
+
+    //Máximo de 18 animal por hectare
+    public function getCapacidadeMaxima():int{
+        return (int) floor($this -> getTamanhoFloat() * 18);
+    }
+
+    //retorna apenas animais vivos
+    public function getAnimaisVivos(): Collection{
+        return $this->cows->filter(fn(Cow $c) => !$c->isAbatido());
+    }
+
+    //Ve se a fazenda tem capacidade
+    public function temCapacidade(): bool{
+        return  $this->getAnimaisVivos()->count() < $this->getCapacidadeMaxima();
     }
 }

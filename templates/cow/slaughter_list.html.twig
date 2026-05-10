@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Lista de Abate{% endblock %}
+
+{% block body %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h2 class="text-danger">Lista de Abate</h2>
+            <span class="badge bg-danger fs-6">{{ animais|length }} animal(is)</span>
+        </div>
+
+        {% if animais|length == 0 %}
+            <div class="alert alert-success">
+                 Nenhum animal com condições para abate.
+            </div>
+        {% else %}
+            <div class="table-responsive">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Código</th>
+                        <th>Fazenda</th>
+                        <th>Nascimento / Idade</th>
+                        <th>Leite (L/sem)</th>
+                        <th>Ração (kg/dia)</th>
+                        <th>Peso (@)</th>
+                        <th>Motivos</th>
+                        <th>Ação</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for cow in animais %}
+                        <tr>
+                            <td><span class="badge bg-danger">{{ cow.codigo }}</span></td>
+                            <td>{{ cow.fazenda.name }}</td>
+                            <td>
+                                {{ cow.dataNascimento|date('d/m/Y') }}
+                                <br><small class="text-muted">{{ cow.idadeEmAnos|number_format(1, ',', '.') }} anos</small>
+                            </td>
+                            <td>{{ cow.leiteFloat|number_format(2, ',', '.') }}</td>
+                            <td>{{ cow.racaoPorDia|number_format(2, ',', '.') }}</td>
+                            <td>{{ cow.pesoEmArrobas|number_format(2, ',', '.') }}@</td>
+                            <td>
+                                {% for motivo in cow.motivoAbate %}
+                                    <span class="badge bg-warning text-dark d-block mb-1">{{ motivo }}</span>
+                                {% endfor %}
+                            </td>
+                            <td>
+                                <form method="post" action="{{ path('cow_slaughter', {id: cow.id}) }}"
+                                      onsubmit="return confirm('Confirma o abate do animal {{ cow.codigo }}?')">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('abate-' ~ cow.id) }}">
+                                    <button class="btn btn-sm btn-danger">Abater</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}
