@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: FarmRepository::class)]
+#[UniqueEntity(fields: ['name'], message: 'Já existe uma fazenda com esse nome')]
 class Farm
 {
     #[ORM\Id]
@@ -17,12 +18,16 @@ class Farm
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
+    #[Assert\NotBlank(message: 'Informe o nome da fazenda')]
     private ?string $name = null;
 
     #[ORM\Column(length: 150)]
+    #[Assert\NotBlank(message: 'Informe o responsável da fazenda')]
     private ?string $responsavel = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
+    #[Assert\NotBlank(message: 'O tamanho é obrigatório.')]
+    #[Assert\Positive(message: 'O tamanho deve ser maior que zero.')]
     private ?string $tamanho = null;
 
     #[ORM\ManyToMany(targetEntity: Veterinarian::class, inversedBy: 'farms')]

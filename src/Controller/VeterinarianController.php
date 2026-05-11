@@ -30,13 +30,22 @@ class VeterinarianController extends AbstractController
     }
 
     #[Route('/novo', name:'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em) : Response
+    public function new(Request $request, EntityManagerInterface $em, VeterinarianRepository $repo) : Response
     {
         $vet = new Veterinarian();
         $form = $this->createForm(VeterinarianType::class, $vet);
         $form -> handleRequest($request);
 
+        //valida o CRMV do vet para não criar dois iguais
         if($form -> isSubmitted() && $form -> isValid()) {
+            $existing = $repo->findOneBy(['crmv' => $vet->getCrmv()]);
+            if ($existing){
+                $this->addFlash('danger', "Já exite um veterinário com esse CRVM \" {$vet->getCrmv()}\".");
+                return $this->render('veterinarian/form.html.twig',[
+                    'form' => $form,
+                    'title' => 'Novo Veterinário',
+                ]);
+            }
             $em -> persist($vet);
             $em -> flush();
             $this -> addFlash('success', 'Veterinário cadastrado');
@@ -50,12 +59,29 @@ class VeterinarianController extends AbstractController
     }
 
     #[Route('/{id}/editar', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Veterinarian $vet, Request $request, EntityManagerInterface $em) : Response
+    public function edit(Veterinarian $vet, Request $request, EntityManagerInterface $em, VeterinarianRepository $repo) : Response
     {
         $form = $this -> createForm(VeterinarianType::class, $vet);
         $form -> handleRequest($request);
 
         if($form -> isSubmitted() && $form -> isValid()){
+            //validação do mesmo CRMV no editar
+            $existing = $repo->createQueryBuilder('v')
+                ->where('v.crmv = :crmv')
+                ->andWhere('v.id != :id')
+                ->setParameter('crmv', $vet->getCrmv())
+                ->setParameter('id', $vet->getId())
+                ->getQuery()
+                ->getOneOrNullResult();
+
+            if($existing){
+                $this->addFlash('danger', "Já exite um veterinário com esse CRVM \" {$vet->getCrmv()}\".");
+                return $this->render('veterinarian/form.html.twig',[
+                    'form' => $form,
+                    'title' => 'Editar Veterinário',
+                    'vet' => $vet,
+                ]);
+            }
             $em -> flush();
             $this->addFlash('success', 'Veterinário atualizado');
             return $this ->redirectToRoute('veterinarian_index');

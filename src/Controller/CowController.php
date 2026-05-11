@@ -43,7 +43,7 @@ class CowController extends AbstractController
             $existing = $repo->findOneBy(['codigo' => $cow->getCodigo(), 'abatido' =>false]);
             if ($existing){
                 $this->addFlash('danger', "Já existe um animal com esse codigo \"{$cow->getCodigo()}\".");
-                return $$this->render('cow/form.html.twig', ['form' => $form, 'title' => 'Novo Animal']);
+                return $this->render('cow/form.html.twig', ['form' => $form, 'title' => 'Novo Animal']);
             }
 
             //ve se fazenda tem capacidade

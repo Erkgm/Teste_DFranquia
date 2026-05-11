@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VeterinarianRepository::class)]
+#[UniqueEntity(fields: ['crmv'], message: 'Já existe um veterinário com este CRMV.')]
 class Veterinarian
 {
     #[ORM\Id]
@@ -16,9 +17,11 @@ class Veterinarian
     private ?int $id = null;
 
     #[ORM\Column(length: 150)]
+    #[Assert\NotBlank(message: 'Informe o nome do veterinário')]
     private ?string $name = null;
 
     #[ORM\Column(length: 20)]
+    #[Assert\NotBlank(message: 'CRMV é obrigatório')]
     private ?string $crmv = null;
 
     /**
