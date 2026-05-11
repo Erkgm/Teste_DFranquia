@@ -4,7 +4,100 @@
 
 {% block body %}
     <div class="container mt-4">
-        <h2>Bem-vindo ao FazendaFranquia</h2>
-        <p class="text-muted">Selecione uma opção</p>
+        <h2 class="mb-4">Relatório Geral</h2>
+
+        <!-- Tela inicial -->
+        <div class="row g-3 mb-4">
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">Animais vivos</div>
+                        <div class="fw-bold fs-4">{{ totalAnimais }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">Fazendas</div>
+                        <div class="fw-bold fs-4">{{ totalFazendas }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <div class="text-muted small">Veterinários</div>
+                        <div class="fw-bold fs-4">{{ totalVets }}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-6 col-xl-3">
+                <div class="card border-0 shadow-sm h-100 {{ totalElegiveis > 0 ? 'border-danger' : '' }}">
+                    <div class="card-body">
+                        <div class="text-muted small">Elegíveis para abate</div>
+                        <div class="fw-bold fs-4 {{ totalElegiveis > 0 ? 'text-danger' : '' }}">{{ totalElegiveis }}</div>
+                        {% if totalElegiveis > 0 %}
+                            <a href="{{ path('cow_slaughter_list') }}" class="small text-danger">Ver lista →</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Produção de leite e ração -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted">Total de Leite / Semana</h6>
+                        <div class="fw-bold fs-3 text-success">{{ totalLeite|number_format(2, ',', '.') }} L</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h6 class="text-muted">🌾 Total de Ração / Semana</h6>
+                        <div class="fw-bold fs-3 text-warning">{{ totalRacao|number_format(2, ',', '.') }} kg</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Animal jovem com alto consumo-->
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white">
+                <h6 class="mb-0"> Animais com até 1 ano e consumo &gt; 500kg de ração/semana</h6>
+            </div>
+            <div class="card-body p-0">
+                {% if jovensAltoConsumo|length == 0 %}
+                    <div class="p-3 text-muted">Nenhum animal nessa condição.</div>
+                {% else %}
+                    <table class="table table-hover mb-0">
+                        <thead class="table-light">
+                        <tr>
+                            <th>Código</th>
+                            <th>Fazenda</th>
+                            <th>Nascimento</th>
+                            <th>Ração (kg/sem)</th>
+                            <th>Leite (L/sem)</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for animal in jovensAltoConsumo %}
+                            <tr>
+                                <td><span class="badge bg-warning text-dark">{{ animal.codigo }}</span></td>
+                                <td>{{ animal.fazenda.name }}</td>
+                                <td>{{ animal.dataNascimento|date('d/m/Y') }}</td>
+                                <td>{{ animal.racaoPorSemana }}</td>
+                                <td>{{ animal.litrosLeitePorSemana }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                {% endif %}
+            </div>
+        </div>
     </div>
 {% endblock %}
