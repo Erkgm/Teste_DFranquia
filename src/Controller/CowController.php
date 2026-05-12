@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/animais', name: 'cow_')]
 class CowController extends AbstractController
 {
+    //index
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(CowRepository $repo, PaginatorInterface $paginator, Request $request): Response
     {
@@ -31,6 +32,7 @@ class CowController extends AbstractController
         ]);
     }
 
+    // new--
     #[Route('/novo', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, CowRepository $repo): Response
     {
@@ -66,6 +68,7 @@ class CowController extends AbstractController
 
     }
 
+    //edit
     #[Route('/{id}/editar', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Cow $cow, Request $request, EntityManagerInterface $em,  CowRepository $repo): Response
     {
@@ -104,6 +107,7 @@ class CowController extends AbstractController
         ]);
     }
 
+    //delete
     #[Route('/{id}/excluir', name:'delete', methods:['POST'])]
     public function delete(Cow $cow, Request $request, EntityManagerInterface $em) :Response
     {
@@ -116,6 +120,7 @@ class CowController extends AbstractController
         return $this -> redirectToRoute('cow_index');
     }
 
+    //list de abate
     #[Route('/lista-abate', name: 'slaughter_list', methods: ['GET'])]
     public function slaughterList(CowRepository $repo): Response
     {
@@ -134,6 +139,7 @@ class CowController extends AbstractController
         ]);
     }
 
+    //pronto para abate
     #[Route('/{id}/abater', name: 'slaughter', methods: ['POST'])]
     public function slaughter(Cow $cow, Request $request, EntityManagerInterface $em):Response
     {

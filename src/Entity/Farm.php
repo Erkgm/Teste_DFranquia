@@ -122,7 +122,6 @@ class Farm
     public function removeCow(Cow $cow): static
     {
         if ($this->cows->removeElement($cow)) {
-            // set the owning side to null (unless already changed)
             if ($cow->getFazenda() === $this) {
                 $cow->setFazenda(null);
             }
@@ -132,12 +131,13 @@ class Farm
     }
 
 
-    //Regra de quantidade de animal e vivo
+    //Regras
+    //quantidade de animal e que esteja vivo
     public function getTamanhoFloat(): float{
         return (float) $this->tamanho;
     }
 
-    //Máximo de 18 animal por hectare
+    //max de 18 animal por hectare
     public function getCapacidadeMaxima():int{
         return (int) floor($this -> getTamanhoFloat() * 18);
     }

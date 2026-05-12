@@ -35,7 +35,7 @@
                     <td>
                         <a href="{{ path('cow_edit', {id: cow.id}) }}" class="btn btn-sm btn-warning">Editar</a>
                         <form method="post" action="{{ path('cow_delete', {id: cow.id}) }}" class="d-inline"
-                              onsubmit="return confirm('Confirma a exclusão?')">
+                              onsubmit="return confirm('Confirme a exclusão')">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete-cow-' ~ cow.id) }}">
                             <button class="btn btn-sm btn-danger">Excluir</button>
                         </form>
@@ -43,7 +43,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="7" class="text-center">Nenhum animal cadastrado.</td>
+                    <td colspan="7" class="text-center">Nenhum animal cadastrado</td>
                 </tr>
             {% endfor %}
             </tbody>

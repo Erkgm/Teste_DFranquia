@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/fazendas', name: 'farm_')]
 class FarmController extends AbstractController
 {
+    //index
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(FarmRepository $repo, PaginatorInterface $paginator, Request $request): Response
     {
@@ -29,6 +30,7 @@ class FarmController extends AbstractController
         ]);
     }
 
+    //new
     #[Route('/novo', name: 'new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, FarmRepository $repo): Response
     {
@@ -64,6 +66,7 @@ class FarmController extends AbstractController
         ]);
     }
 
+    //edita
     #[Route('/{id}/editar', name: 'edit', methods: ['GET', 'POST'] )]
     public function edit(Farm $farm, Request $request, EntityManagerInterface  $em, FarmRepository $repo): Response
     {
@@ -100,6 +103,7 @@ class FarmController extends AbstractController
     ]);
     }
 
+    //delete
     #[Route('/{id}/excluir', name: 'delete', methods: ['POST'])]
     public function delete(Farm $farm, Request $request, EntityManagerInterface $em): Response
     {

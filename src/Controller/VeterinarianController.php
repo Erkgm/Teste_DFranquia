@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/veterinarios', name: 'veterinarian_')]
 class VeterinarianController extends AbstractController
 {
+    //index
     #[Route('', name: 'index', methods: ['GET'])]
     public function index(VeterinarianRepository $repo, PaginatorInterface $paginator, Request $request) : Response
     {
@@ -29,6 +30,7 @@ class VeterinarianController extends AbstractController
         ]);
     }
 
+    //new
     #[Route('/novo', name:'new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $em, VeterinarianRepository $repo) : Response
     {
@@ -58,6 +60,7 @@ class VeterinarianController extends AbstractController
         ]);
     }
 
+    //edit
     #[Route('/{id}/editar', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Veterinarian $vet, Request $request, EntityManagerInterface $em, VeterinarianRepository $repo) : Response
     {
@@ -94,6 +97,7 @@ class VeterinarianController extends AbstractController
         ]);
     }
 
+    //delete
     #[Route('/{id}/excluir', name: 'delete', methods: ['POST'])]
     public function delete(Veterinarian $vet, Request $request, EntityManagerInterface $em) : Response
     {

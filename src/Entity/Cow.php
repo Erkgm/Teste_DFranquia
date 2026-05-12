@@ -35,8 +35,8 @@ class Cow
     private ?string $litrosLeitePorSemana = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
-    #[Assert\NotBlank(message: 'Quantidade da ração é obrigatório')]
-    #[Assert\PositiveOrZero(message: 'A quantidade não pode ser negatica')]
+    #[Assert\NotBlank(message: 'Quantidade de ração é obrigatório')]
+    #[Assert\PositiveOrZero(message: 'A quantidade não pode ser negativa')]
     private ?string $racaoPorSemana = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
@@ -158,7 +158,7 @@ class Cow
         return $this;
     }
 
-    //validação da datga de nascimento
+    //validação para a datga de nascimento
     #[Assert\Callback]
     public function validarDataNascimento(ExecutionContextInterface $context): void
     {
@@ -228,16 +228,16 @@ class Cow
         $motivos = [];
 
         if($this->isIdadeExcedida()){
-            $motivos[] = 'Idade maior de 5 anos(' . number_format($this->getIdadeEmAnos(), 1, ',', '.') . 'anos';
+            $motivos[] = 'Idade maior de 5 anos (' . number_format($this->getIdadeEmAnos(), 1, ',', '.') . '.';
         }
         if ($this->isProducaoLeiteBaixa()) {
             $motivos[] = 'Produção de leite abaixo de 40L/semana (' . $this->getLeiteFloat() . 'L)';
         }
         if ($this->isIneficiente()) {
-            $motivos[] = 'Produção < 70L/semana e ração > 50kg/dia (' . number_format($this->getRacaoPorDia(), 1, ',', '.') . 'kg/dia)';
+            $motivos[] = 'Produção menos de 70L/semana e consumo de ração mais 50kg/dia (' . number_format($this->getRacaoPorDia(), 1, ',', '.') . 'kg/dia)';
         }
         if ($this->isPesoExcedido()) {
-            $motivos[] = 'Peso superior a 18 arrobas (' . number_format($this->getPesoEmArrobas(), 2, ',', '.') . '@)';
+            $motivos[] = 'Peso superior a 18 arrobas (' . number_format($this->getPesoEmArrobas(), 2, ',', '.') . ('.');
         }
         return $motivos;
     }

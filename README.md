@@ -12,5 +12,5 @@ http://localhost:8000/relatorios/abatidos
 
 deixar a estilização bonitinha e intuitivva
 
-gerar um migration para fazer o preenchimento do banco de dados
+gerar um migration(fixtures) para fazer o preenchimento do banco de dados
 
