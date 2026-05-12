@@ -1,16 +1,7 @@
 http://localhost:8000/
 
-http://localhost:8000/fazendas
+relação ao docker
 
-http://localhost:8000/veterinarios
 
-http://localhost:8000/animais
-
-http://localhost:8000/animais/lista-abate
-
-http://localhost:8000/relatorios/abatidos
-
-deixar a estilização bonitinha e intuitivva
-
-gerar um migration(fixtures) para fazer o preenchimento do banco de dados
-
+.env:
+DATABASE_URL="mysql://USUARIO:SENHA@127.0.0.1:3306/NOME_DO_BANCO?serverVersion=8.0&charset=utf8mb4"

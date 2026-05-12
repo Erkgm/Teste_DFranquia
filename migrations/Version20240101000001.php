@@ -9,6 +9,10 @@ use Doctrine\Migrations\AbstractMigration;
 
 final class Version20240101000001 extends AbstractMigration
 {
+    public function getDescription(): string
+    {
+        return 'Dados de exemplo para testes';
+    }
 
     public function up(Schema $schema): void
     {
