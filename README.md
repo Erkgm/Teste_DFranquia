@@ -1,6 +1,9 @@
 http://localhost:8000/
 
-relação ao docker
+
+
+Ver se não tem que mudar nada por conta das regras de negocio que foram colocadas
+EX:em Cow Entity e CowController, existem regras que talvez não deve ficar lá
 
 
 .env:

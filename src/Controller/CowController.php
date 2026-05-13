@@ -5,159 +5,141 @@ namespace App\Controller;
 use App\Entity\Cow;
 use App\Form\CowType;
 use App\Repository\CowRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\FarmRepository;
+use App\Service\CowService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-
 #[Route('/animais', name: 'cow_')]
 class CowController extends AbstractController
 {
+    public function __construct(
+        private CowRepository $repo,
+        private CowService $service,
+        private PaginatorInterface $paginator,
+    ) {}
+
     //index
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(CowRepository $repo, PaginatorInterface $paginator, Request $request): Response
+    public function index(Request $request, FarmRepository $farmRepo): Response
     {
-        $query = $repo -> createQueryBuilder('c')
-            ->where('c.abatido = false')
-            ->orderBy('c.codigo', 'ASC')
-            ->getQuery();
+        $farmId = $request->query->getInt('farm_id') ?: null;
 
-        $pagination = $paginator -> paginate($query, $request -> query -> getInt('page', 1), 10);
+        $qb = $farmId
+            ? $this->repo->createQueryBuilder('c')
+                ->join('c.fazenda', 'f')
+                ->where('c.abatido = false')
+                ->andWhere('f.id = :farmId')
+                ->setParameter('farmId', $farmId)
+                ->orderBy('c.codigo', 'ASC')
+            : $this->repo->createQueryBuilder('c')
+                ->where('c.abatido = false')
+                ->orderBy('c.codigo', 'ASC');
+
+        $pagination = $this->paginator->paginate($qb, $request->query->getInt('page', 1), 15);
 
         return $this->render('cow/index.html.twig', [
             'pagination' => $pagination,
+            'farms'      => $farmRepo->findAll(),
+            'selectedFarmId' => $farmId,
         ]);
     }
 
-    // new--
+    //new
     #[Route('/novo', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, CowRepository $repo): Response
+    public function new(Request $request): Response
     {
         $cow = new Cow();
-        $form = $this ->createForm(CowType::class, $cow);
-        $form -> handleRequest($request);
+        $form = $this->createForm(CowType::class, $cow);
+        $form->handleRequest($request);
 
-        if($form -> isSubmitted() && $form -> isValid()) {
-            //ve se animal é codigo unico
-            $existing = $repo->findOneBy(['codigo' => $cow->getCodigo(), 'abatido' =>false]);
-            if ($existing){
-                $this->addFlash('danger', "Já existe um animal com esse codigo \"{$cow->getCodigo()}\".");
-                return $this->render('cow/form.html.twig', ['form' => $form, 'title' => 'Novo Animal']);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $error = $this->service->create($cow);
+            if ($error) {
+                $this->addFlash('danger', $error);
+            } else {
+                $this->addFlash('success', 'Animal cadastrado com sucesso!');
+                return $this->redirectToRoute('cow_index');
             }
-
-            //ve se fazenda tem capacidade
-            $fazenda = $cow->getFazenda();
-            if (!$fazenda->temCapacidade()){
-                $this->addFlash('danger', "A fazenda \"{fazenda->getName()}\" atingiu a capacidade máxima {$fazenda->getCapacidadeMaxima()} animais.");
-                return $this->render('cow/form.html.twig', ['form' => $form, 'title' => 'Novo Animal']);
-            }
-            $cow -> setAbatido(false);
-            $em -> persist($cow);
-            $em ->flush();
-            $this -> addFlash('success', 'Animal cadastrado');
-            return $this -> redirectToRoute('cow_index');
         }
 
-        return $this -> render('cow/form.html.twig', [
-            'form' => $form,
-            'title' => 'Novo animal',
+        return $this->render('cow/form.html.twig', [
+            'form'  => $form,
+            'title' => 'Novo Animal',
         ]);
-
     }
 
     //edit
     #[Route('/{id}/editar', name: 'edit', methods: ['GET', 'POST'])]
-    public function edit(Cow $cow, Request $request, EntityManagerInterface $em,  CowRepository $repo): Response
+    public function edit(Cow $cow, Request $request): Response
     {
-        if($cow -> isAbatido()){
-            $this -> addFlash('warning', 'Animais abatidos não pode ser editado');
-            return $this -> redirectToRoute('cow_index');
+        if ($cow->isAbatido()) {
+            $this->addFlash('warning', 'Animais abatidos não podem ser editados.');
+            return $this->redirectToRoute('cow_index');
         }
 
-        $form = $this ->createForm(CowType::class, $cow);
-        $form ->handleRequest($request);
+        $form = $this->createForm(CowType::class, $cow);
+        $form->handleRequest($request);
 
-        if ($form -> isSubmitted() && $form -> isValid()){
-            //valida codigo unico
-            $existing = $repo->createQueryBuilder('c')
-                ->where('c.codigo = :codigo')
-                ->andWhere('c.abitdo = false')
-                ->andWhere('c.id != :id')
-                ->setParameter('codigo', $cow->getCodigo())
-                ->setParameter('id', $cow->getId())
-                ->getQuery()
-                ->getOneOrNullResult();
-
-            if($existing){
-                $this->addFlash('danger', "Já existe um animal vivo com o codigo \"{$cow->getCodigo()}\""."");
-                return $this->render('cow/form.html.twig', ['form' => $form, 'title' => 'Editar animal', 'cow' =>$cow]);
+        if ($form->isSubmitted() && $form->isValid()) {
+            $error = $this->service->update($cow);
+            if ($error) {
+                $this->addFlash('danger', $error);
+            } else {
+                $this->addFlash('success', 'Animal atualizado com sucesso!');
+                return $this->redirectToRoute('cow_index');
             }
-            $em -> flush();
-            $this ->addFlash('success', 'Animal atualizado');
-            return $this -> redirectToRoute('cow_index');
         }
 
-        return $this -> render('cow/form.html.twig', [
-            'form' => $form,
-            'title' => 'Editar animal',
-            'cow' => $cow,
+        return $this->render('cow/form.html.twig', [
+            'form'  => $form,
+            'title' => 'Editar Animal',
+            'cow'   => $cow,
         ]);
     }
 
-    //delete
-    #[Route('/{id}/excluir', name:'delete', methods:['POST'])]
-    public function delete(Cow $cow, Request $request, EntityManagerInterface $em) :Response
+    //delete animal
+    #[Route('/{id}/excluir', name: 'delete', methods: ['POST'])]
+    public function delete(Cow $cow, Request $request): Response
     {
-        if($this -> isCsrfTokenValid('delete-cow-' . $cow -> getId(), $request -> get('_token'))) {
-            $em -> remove($cow);
-            $em -> flush();
-            $this -> addFlash('success', 'Animal excluído');
+        if ($this->isCsrfTokenValid('delete-cow-' . $cow->getId(), $request->get('_token'))) {
+            $codigo = $cow->getCodigo();
+            $this->repo->getEntityManager()->remove($cow);
+            $this->repo->getEntityManager()->flush();
+            $this->addFlash('success', "Animal \"{$codigo}\" removido com sucesso!");
         }
 
-        return $this -> redirectToRoute('cow_index');
+        return $this->redirectToRoute('cow_index');
     }
 
-    //list de abate
+    //lista dos animais de abate
     #[Route('/lista-abate', name: 'slaughter_list', methods: ['GET'])]
-    public function slaughterList(CowRepository $repo): Response
+    public function slaughterList(): Response
     {
-        $animais = $repo->createQueryBuilder('c')
-            ->join('c.fazenda', 'f')
-            ->addSelect('f')
-            ->where('c.abatido = false')
-            ->orderBy('f.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-
-        $elegiveis = array_filter($animais, fn(Cow $c) => $c->podeSerAbatido());
-
         return $this->render('cow/slaughter_list.html.twig', [
-            'animais' => $elegiveis,
+            'animais' => $this->repo->findProntosParaAbate(),
         ]);
     }
 
     //pronto para abate
     #[Route('/{id}/abater', name: 'slaughter', methods: ['POST'])]
-    public function slaughter(Cow $cow, Request $request, EntityManagerInterface $em):Response
+    public function slaughter(Cow $cow, Request $request): Response
     {
-        if(!$this->isCsrfTokenValid('abate-' . $cow->getId(), $request->get('_token'))){
-            $this->addFlash('danger', 'Token inválido');
+        if (!$this->isCsrfTokenValid('abate-' . $cow->getId(), $request->get('_token'))) {
+            $this->addFlash('danger', 'Token inválido.');
             return $this->redirectToRoute('cow_slaughter_list');
         }
 
-        if(!$cow->podeSerAbatido()){
-            $this->addFlash('danger', "O animal \"{$cow->getCodigo()}\"não atande as condições para abate");
-            return $this->redirectToRoute('cow_slaughter_list');
+        $error = $this->service->slaughter($cow);
+        if ($error) {
+            $this->addFlash('danger', $error);
+        } else {
+            $this->addFlash('success', "Animal \"{$cow->getCodigo()}\" enviado para abate");
         }
 
-        $cow->setAbatido(true);
-        $cow->setAbatidoEm(new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')));
-        $em -> flush();
-        $this->addFlash('success', "Animal \" {$cow->getCodigo()}\"enviado para abate");
         return $this->redirectToRoute('cow_slaughter_list');
-
     }
 }

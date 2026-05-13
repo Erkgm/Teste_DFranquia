@@ -118,7 +118,6 @@ class Cow
     public function setDataNascimento(\DateTime $d): static
     {
         $this->dataNascimento = $d;
-
         return $this;
     }
 

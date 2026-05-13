@@ -64,9 +64,6 @@ class Veterinarian
         return $this;
     }
 
-    /**
-     * @return Collection<int, Farm>
-     */
     public function getFarms(): Collection
     {
         return $this->farms;

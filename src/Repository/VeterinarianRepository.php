@@ -16,28 +16,45 @@ class VeterinarianRepository extends ServiceEntityRepository
         parent::__construct($registry, Veterinarian::class);
     }
 
-    //    /**
-    //     * @return Veterinarian[] Returns an array of Veterinarian objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('v.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    //busca todos vet por ordem
+    public function findAllOrderedByName(): array
+    {
+        return $this->createQueryBuilder('v')
+            ->orderBy('v.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 
-    //    public function findOneBySomeField($value): ?Veterinarian
-    //    {
-    //        return $this->createQueryBuilder('v')
-    //            ->andWhere('v.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+    //busca por cmrv
+    public function findByCrmv(string $crmv): ?Veterinarian
+    {
+        return $this->createQueryBuilder('v')
+            ->where('v.crmv = :crmv')
+            ->setParameter('crmv', strtoupper(trim($crmv)))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    //busca por nome ou crmv
+    public function findByNameOrCrmv(string $term): array
+    {
+        return $this->createQueryBuilder('v')
+            ->where('LOWER(v.name) LIKE LOWER(:term)')
+            ->orWhere('LOWER(v.crmv) LIKE LOWER(:term)')
+            ->setParameter('term', '%' . $term . '%')
+            ->orderBy('v.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    //busca todos com ligados a fazenda
+    public function findAllWithFarms(): array
+    {
+        return $this->createQueryBuilder('v')
+            ->leftJoin('v.farms', 'f')
+            ->addSelect('f')
+            ->orderBy('v.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

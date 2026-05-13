@@ -16,28 +16,51 @@ class FarmRepository extends ServiceEntityRepository
         parent::__construct($registry, Farm::class);
     }
 
-    //    /**
-    //     * @return Farm[] Returns an array of Farm objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('f.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    //busca de todas as fazendas ordenadas
+   public function findAllOrderByName(): array
+   {
+       return $this->createQueryBuilder('f')
+           ->orderBy('f.name', 'ASC')
+           ->getQuery()
+           ->getResult();
+   }
 
-    //    public function findOneBySomeField($value): ?Farm
-    //    {
-    //        return $this->createQueryBuilder('f')
-    //            ->andWhere('f.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+   //busca as fazendas com os veterinario
+   public function findAllWithVet():array
+   {
+       return $this->createQueryBuilder('f')
+           ->leftJoin('f.veterinarios', 'v')
+           ->addSelect('v')
+           ->orderBy('f.name', 'ASC')
+           ->getQuery()
+           ->getResult();
+   }
+
+   //busca de fazenda com capacidade disponivel
+   public function findFarmWithCap(): array
+   {
+       $farms = $this->findAllWithVet();
+       return array_filter($farms, fn(Farm $f) => $f->temCapacidade());
+   }
+
+   //busca pelo nome exato da fazenda
+    public function findExactName(string $name): ?Farm
+    {
+        return $this->createQueryBuilder('f')
+            ->where('f.name = :name')
+            ->setParameter('name', $name)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findNameOrResponsavel(string $term): array
+    {
+        return $this->createQueryBuilder('f')
+            ->where('LOWER(f.name) LIKE LOWER(:term)')
+            ->orWhere('LOWER(f.responsavel) LIKE LOWER(:term)')
+            ->setParameter('term', '%' . $term . '%')
+            ->orderBy('f.name', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

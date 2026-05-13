@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Entity\Farm;
 use App\Form\FarmType;
 use App\Repository\FarmRepository;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Service\FarmService;
 use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,49 +15,52 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/fazendas', name: 'farm_')]
 class FarmController extends AbstractController
 {
+    public function __construct(
+        private FarmRepository $repo,
+        private FarmService $service,
+        private PaginatorInterface $paginator,
+    ) {}
+
+
     //index
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(FarmRepository $repo, PaginatorInterface $paginator, Request $request): Response
+    public function index(Request $request): Response
     {
-        $query = $repo -> createQueryBuilder('f')
-            ->orderBy('f.name', 'ASC')
-            ->getQuery();
+        $search = $request->query -> get('search', '');
 
-        $pagination = $paginator -> paginate($query, $request->query->getInt('page', 1), 10);
+        $qb = $search
+            ? $this->repo->createQueryBuilder('f')
+                ->where('LOWER(f.name) LIKE LOWER(:term)')
+                ->orWhere('LOWER(f.responsavel) LIKE LOWER(:term)')
+                ->setParameter('term', '%' . $search . '%')
+                ->orderBy('f.name', 'ASC')
+            : $this->repo->createQueryBuilder('f')
+            ->orderBy('f.name', 'ASC');
+
+        $pagination = $this->paginator->paginate($qb, $request->query->getInt('page', 1), 10);
 
         return $this->render('farm/index.html.twig', [
             'pagination' => $pagination,
+            'search' => $search,
         ]);
     }
 
     //new
     #[Route('/novo', name: 'new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $em, FarmRepository $repo): Response
+    public function new(Request $request): Response
     {
         $farm = new Farm();
         $form = $this->createForm(FarmType::class, $farm);
         $form -> handleRequest($request);
 
         if($form -> isSubmitted() && $form -> isValid()) {
-            //validação do nome
-            if($form -> isSubmitted() && $form -> isValid()) {
-                $existing = $repo->findOneBy(['name' => $farm->getName()]);
-                if ($existing){
-                    $this->addFlash('danger', "Já exite uma fazenda com esse nome \" {$farm->getName()}\".");
-                    return $this->render('farm/form.html.twig',[
-                        'form' => $form,
-                        'title' => 'Novo Fazenda',
-                    ]);
-                }
-                $em -> persist($farm);
-                $em -> flush();
+            $error = $this->service->create($farm);
+            if ($error){
+                $this->addFlash('danger', $error);
+            } else{
                 $this -> addFlash('success', 'Fazenda cadastrado');
-                return $this -> redirectToRoute('farm_index');
+                return $this->redirectToRoute('farm_index');
             }
-            $em -> persist($farm);
-            $em -> flush();
-            $this -> addFlash('success', 'Fazenda cadastrada');
-            return $this -> redirectToRoute('farm_index');
         }
 
         return $this -> render('farm/form.html.twig',[
@@ -68,32 +71,19 @@ class FarmController extends AbstractController
 
     //edita
     #[Route('/{id}/editar', name: 'edit', methods: ['GET', 'POST'] )]
-    public function edit(Farm $farm, Request $request, EntityManagerInterface  $em, FarmRepository $repo): Response
+    public function edit(Farm $farm, Request $request): Response
     {
         $form = $this -> createForm(FarmType::class, $farm);
         $form -> handleRequest($request);
 
         if($form -> isSubmitted() && $form -> isValid()){
-            //validação para o nome
-            $existing = $repo->createQueryBuilder('f')
-                ->where('f.name = :name')
-                ->andWhere('f.id != :id')
-                ->setParameter('name', $farm->getName())
-                ->setParameter('id', $farm->getId())
-                ->getQuery()
-                ->getOneOrNullResult();
-
-            if($existing){
-                $this->addFlash('danger', "Já exite uma fazenda com esse nome\" {$farm->getName()}\".");
-                return $this->render('farm/form.html.twig',[
-                    'form' => $form,
-                    'title' => 'Editar Fazenda',
-                    'vet' => $farm,
-                ]);
+            $error = $this->service->update($farm);
+            if ($error){
+                $this->addFlash('danger', $error);
+            } else {
+                $this -> addFlash('success', 'Fazenda atualizada');
+                return $this -> redirectToRoute('farm_index');
             }
-            $em -> flush();
-            $this -> addFlash('success', 'Fazenda atualizada');
-            return $this -> redirectToRoute('farm_index');
         }
 
         return $this -> render('farm/form.html.twig', [
@@ -105,12 +95,15 @@ class FarmController extends AbstractController
 
     //delete
     #[Route('/{id}/excluir', name: 'delete', methods: ['POST'])]
-    public function delete(Farm $farm, Request $request, EntityManagerInterface $em): Response
+    public function delete(Farm $farm, Request $request): Response
     {
         if($this -> isCsrfTokenValid('delete-farm-' . $farm -> getId(), $request -> get('_token'))) {
-            $em -> remove($farm);
-            $em -> flush();
-            $this -> addFlash('success', 'Fazenda excluída');
+            $error = $this->service->delete($farm);
+            if($error){
+                $this->addFlash('danger', $error);
+            } else {
+                $this -> addFlash('success', 'Fazenda excluída');
+            }
         }
 
         return $this -> redirectToRoute('farm_index');
