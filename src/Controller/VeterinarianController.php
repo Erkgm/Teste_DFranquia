@@ -78,7 +78,7 @@ class VeterinarianController extends AbstractController
         if($form -> isSubmitted() && $form -> isValid()){
             $error = $this->service->update($vet);
             if ($error){
-                $this->addFlash('danget', $error);
+                $this->addFlash('danger', $error);
             } else{
                 $this->addFlash('success', 'Veterinário atualizado');
                 return $this->redirectToRoute('veterinarian_index');
@@ -98,7 +98,7 @@ class VeterinarianController extends AbstractController
     public function delete(Veterinarian $vet, Request $request) : Response
     {
         if($this -> isCsrfTokenValid('delete-vet-' . $vet -> getId(), $request -> request -> get('_token'))) {
-            $error = $this->service->delete('vet');
+            $error = $this->service->delete($vet);
             if ($error){
                 $this->addFlash('danger', $error);
             } else{

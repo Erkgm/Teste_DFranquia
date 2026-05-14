@@ -61,7 +61,7 @@ class CowController extends AbstractController
             if ($error) {
                 $this->addFlash('danger', $error);
             } else {
-                $this->addFlash('success', 'Animal cadastrado com sucesso!');
+                $this->addFlash('success', 'Animal cadastrado');
                 return $this->redirectToRoute('cow_index');
             }
         }
@@ -77,7 +77,7 @@ class CowController extends AbstractController
     public function edit(Cow $cow, Request $request): Response
     {
         if ($cow->isAbatido()) {
-            $this->addFlash('warning', 'Animais abatidos não podem ser editados.');
+            $this->addFlash('warning', 'Animais abatidos não podem ser editados');
             return $this->redirectToRoute('cow_index');
         }
 
@@ -89,7 +89,7 @@ class CowController extends AbstractController
             if ($error) {
                 $this->addFlash('danger', $error);
             } else {
-                $this->addFlash('success', 'Animal atualizado com sucesso!');
+                $this->addFlash('success', 'Animal atualizado');
                 return $this->redirectToRoute('cow_index');
             }
         }
@@ -109,7 +109,7 @@ class CowController extends AbstractController
             $codigo = $cow->getCodigo();
             $this->repo->getEntityManager()->remove($cow);
             $this->repo->getEntityManager()->flush();
-            $this->addFlash('success', "Animal \"{$codigo}\" removido com sucesso!");
+            $this->addFlash('success', "Animal \"{$codigo}\" removido");
         }
 
         return $this->redirectToRoute('cow_index');
@@ -119,8 +119,19 @@ class CowController extends AbstractController
     #[Route('/lista-abate', name: 'slaughter_list', methods: ['GET'])]
     public function slaughterList(): Response
     {
+        $animais = $this->repo->findTodosVivos();
+
+        $elegiveis = [];
+        foreach ($animais as $cow) {
+            if ($this->service->podeSerAbatido($cow)) {
+                $elegiveis[] = [
+                    'cow'     => $cow,
+                    'motivos' => $this->service->getMotivoAbate($cow),
+                ];
+            }
+        }
         return $this->render('cow/slaughter_list.html.twig', [
-            'animais' => $this->repo->findProntosParaAbate(),
+            'elegiveis' => $elegiveis,
         ]);
     }
 

@@ -168,7 +168,6 @@ class Cow
         }
     }
 
-
     //Conversões
     public function getPesoFloat():float{
         return (float) $this ->peso;
@@ -194,58 +193,5 @@ class Cow
         if(!$this->dataNascimento) return 0;
         $diff = (new \DateTime()) -> diff($this->dataNascimento);
         return $diff->y + ($diff->m / 12);
-    }
-
-
-
-    //Regras de Abate
-
-    //Caso tenha mais de 5 anos
-    public function isIdadeExcedida():bool{
-        return $this->getIdadeEmAnos() > self::MAX_IDADE_ANOS;
-    }
-
-    //Caso tenha produção de menos 40L por semana
-    public  function  isProducaoLeiteBaixa():bool{
-        return $this ->getLeiteFloat() < self::MIN_LEITE_SEMANA;
-
-    }
-
-    //Caso a produção tenha menos de 70L/semana e mais de 50kg de ração/dia
-    public function isIneficiente(): bool{
-        return $this->getLeiteFloat() <self::MIN_LEITE_EFICIENCIA &&
-            $this->getRacaoPorDia() > self::MAX_RACAO_DIA;
-    }
-
-    //Caso tenha mais de 18 arrobas
-    public function isPesoExcedido():bool{
-        return $this->getPesoEmArrobas() > self::MAX_PESO_ARROBAS;
-    }
-
-    //Verifica animal para o abate
-    public function getMotivoAbate(): array{
-        $motivos = [];
-
-        if($this->isIdadeExcedida()){
-            $motivos[] = 'Idade maior de 5 anos (' . number_format($this->getIdadeEmAnos(), 1, ',', '.') . '.';
-        }
-        if ($this->isProducaoLeiteBaixa()) {
-            $motivos[] = 'Produção de leite abaixo de 40L/semana (' . $this->getLeiteFloat() . 'L)';
-        }
-        if ($this->isIneficiente()) {
-            $motivos[] = 'Produção menos de 70L/semana e consumo de ração mais 50kg/dia (' . number_format($this->getRacaoPorDia(), 1, ',', '.') . 'kg/dia)';
-        }
-        if ($this->isPesoExcedido()) {
-            $motivos[] = 'Peso superior a 18 arrobas (' . number_format($this->getPesoEmArrobas(), 2, ',', '.') . ('.');
-        }
-        return $motivos;
-    }
-
-    public function podeSerAbatido(): bool
-    {
-        return $this->isIdadeExcedida()
-            || $this->isProducaoLeiteBaixa()
-            || $this->isIneficiente()
-            || $this->isPesoExcedido();
     }
 }

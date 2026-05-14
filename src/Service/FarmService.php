@@ -21,7 +21,7 @@ class FarmService
             return $error;
         }
 
-        $this->em->persist('$farm');
+        $this->em->persist($farm);
         $this->em->flush();
         return null;
     }

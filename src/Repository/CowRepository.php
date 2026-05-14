@@ -17,8 +17,11 @@ class CowRepository extends ServiceEntityRepository
     public function findTodosVivos(): array
     {
         return $this->createQueryBuilder('c')
+            ->join('c.fazenda', 'f')
+            ->addSelect('f')
             ->where('c.abatido = false')
-            ->orderBy('c.codigo', 'ASC')
+            ->orderBy('f.name', 'ASC')
+            ->addOrderBy('c.codigo', 'ASC')
             ->getQuery()
             ->getResult();
     }
@@ -39,15 +42,13 @@ class CowRepository extends ServiceEntityRepository
     //busca de animais prontos para abate
     public function findProntosParaAbate(): array
     {
-        $animais = $this->createQueryBuilder('c')
+        return $this->createQueryBuilder('c')
             ->join('c.fazenda', 'f')
             ->addSelect('f')
             ->where('c.abatido = false')
             ->orderBy('f.name', 'ASC')
             ->getQuery()
             ->getResult();
-
-        return array_filter($animais, fn(Cow $c) => $c->podeSerAbatido());
     }
 
     //busca de animais abatidos
