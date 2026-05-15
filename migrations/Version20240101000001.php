@@ -41,11 +41,14 @@ final class Version20240101000001 extends AbstractMigration
         $this->addSql("INSERT INTO cow (codigo, litros_leite_por_semana, racao_por_semana, peso, data_nascimento, abatido, abatido_em, fazenda_id) VALUES ('BOV-001', 80.00, 200.00, 250.00, '2021-03-10', 0, NULL, @farm1)");
         $this->addSql("INSERT INTO cow (codigo, litros_leite_por_semana, racao_por_semana, peso, data_nascimento, abatido, abatido_em, fazenda_id) VALUES ('BOV-002', 30.00, 400.00, 300.00, '2018-05-10', 0, NULL, @farm1)");
         $this->addSql("INSERT INTO cow (codigo, litros_leite_por_semana, racao_por_semana, peso, data_nascimento, abatido, abatido_em, fazenda_id) VALUES ('BOV-003', 90.00, 150.00, 200.00, '2022-08-15', 0, NULL, @farm2)");
+        //animal com alto consumo
+        $this->addSql("INSERT INTO cow (codigo, litros_leite_por_semana, racao_por_semana, peso, data_nascimento, abatido, abatido_em, fazenda_id) VALUES ('BOV-004', 50.00, 550.00, 180.00, '2025-10-01', 0, NULL, @farm1)");
     }
 
     public function down(Schema $schema): void
     {
         $this->addSql("DELETE FROM cow WHERE codigo IN ('BOV-001', 'BOV-002', 'BOV-003')");
+        $this->addSql("DELETE FROM cow WHERE codigo = 'BOV-004'");
         $this->addSql("DELETE FROM farm_veterinarian WHERE farm_id IN (1, 2)");
         $this->addSql("DELETE FROM farm WHERE name IN ('Fazenda São João', 'Fazenda Cachoeira')");
         $this->addSql("DELETE FROM veterinarian WHERE crmv IN ('GO-12345', 'TO-54321', 'MG-99887')");
