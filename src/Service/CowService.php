@@ -99,6 +99,12 @@ class CowService
             return "Já existe um animal vivo com o código \"{$cow->getCodigo()}\".";
         }
 
+        $fazenda = $cow->getFazenda();
+        if($oldFarmId && $fazenda->getId() !== $oldFarmId){
+            if (!$fazenda->temCapacidade()){
+                return "A fazenda \"{$fazenda->getName()}\" atingiu a capacidade máxima de {$fazenda->getCapacidadeMaxima()} animais.";
+            }
+        }
         $this->em->flush();
         return null;
     }

@@ -35,6 +35,18 @@ class VeterinarianRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
+    //busca vet por crmv excluindo um id especifico
+    public function findByCrmvExcluding(string $crmv, int $excludeId): ?Veterinarian
+    {
+        return $this->createQueryBuilder('v')
+            ->where('v.crmv = :crmv')
+            ->andWhere('v.id != :id')
+            ->setParameter('crmv', strtoupper(trim($crmv)))
+            ->setParameter('id', $excludeId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //busca por nome ou crmv
     public function findByNameOrCrmv(string $term): array
     {
@@ -57,4 +69,20 @@ class VeterinarianRepository extends ServiceEntityRepository
             ->getQuery()
             ->getResult();
     }
+
+    //qb para listagem
+    public function createListQueryBuilder(?string $search = null)
+    {
+        $qb = $this->createQueryBuilder('v')
+            ->orderBy('v.name', 'ASC');
+
+        if ($search) {
+            $qb->where('LOWER(v.name) LIKE LOWER(:term)')
+                ->orWhere('LOWER(v.crmv) LIKE LOWER(:term)')
+                ->setParameter('term', '%' . $search . '%');
+        }
+
+        return $qb;
+    }
+
 }
