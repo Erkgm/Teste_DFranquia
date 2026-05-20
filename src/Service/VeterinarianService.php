@@ -30,21 +30,14 @@ class VeterinarianService
     //valida e att veterinario
     public function update(Veterinarian $vet): ?string
     {
-        $existing = $this->vetRepo->createQueryBuilder('v')
-            ->where('v.crmv =: crmv')
-            ->andWhere('v.id != id')
-            ->setParameter('crmv', $vet->getCrmv())
-            ->setParameter('id', $vet->getId())
-            ->getQuery()
-            ->getOneOrNullResult();
-
+        $existing = $this->vetRepo->findByCrmvExcluding($vet->getCrmv(), $vet->getId());
         if ($existing) {
-            return "Já existe um veterinário com o CRMV \"{$vet->getCrmv()}\"";
+            return "Já existe um veterinário com o CRMV \"{$vet->getCrmv()}\".";
         }
+
         $this->em->flush();
         return null;
     }
-
 
     //valida e delete veterinario
     public function delete(Veterinarian $vet): ?string

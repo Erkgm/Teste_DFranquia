@@ -28,18 +28,7 @@ class CowController extends AbstractController
     {
         $farmId = $request->query->getInt('farm_id') ?: null;
 
-        $qb = $farmId
-            ? $this->repo->createQueryBuilder('c')
-                ->join('c.fazenda', 'f')
-                ->where('c.abatido = false')
-                ->andWhere('f.id = :farmId')
-                ->setParameter('farmId', $farmId)
-                ->orderBy('c.codigo', 'ASC')
-            : $this->repo->createQueryBuilder('c')
-                ->where('c.abatido = false')
-                ->orderBy('c.codigo', 'ASC');
-
-        $pagination = $this->paginator->paginate($qb, $request->query->getInt('page', 1), 15);
+        $pagination = $this->paginator->paginate($this->repo->createListQueryBuilder($farmId), $request->query->getInt('page', 1), 15);
 
         return $this->render('cow/index.html.twig', [
             'pagination' => $pagination,
@@ -81,11 +70,13 @@ class CowController extends AbstractController
             return $this->redirectToRoute('cow_index');
         }
 
+        $oldFarmId = $cow->getFazenda()?->getId();
+
         $form = $this->createForm(CowType::class, $cow);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $error = $this->service->update($cow);
+            $error = $this->service->update($cow, $oldFarmId);
             if ($error) {
                 $this->addFlash('danger', $error);
             } else {
@@ -119,10 +110,10 @@ class CowController extends AbstractController
     #[Route('/lista-abate', name: 'slaughter_list', methods: ['GET'])]
     public function slaughterList(): Response
     {
-        $animais = $this->repo->findTodosVivos();
+        $animals = $this->repo->findAllAlive();
 
         $elegiveis = [];
-        foreach ($animais as $cow) {
+        foreach ($animals as $cow) {
             if ($this->service->podeSerAbatido($cow)) {
                 $elegiveis[] = [
                     'cow'     => $cow,

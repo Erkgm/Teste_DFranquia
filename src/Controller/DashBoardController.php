@@ -20,7 +20,7 @@ class DashBoardController extends AbstractController
         VeterinarianRepository $vetRepo,
         CowService $cowService,
     ): Response {
-        $animaisVivos = $cowRepo->findTodosVivos();
+        $animaisVivos = $cowRepo->findAllAlive();
         $elegiveis = array_filter($animaisVivos, fn($cow) => $cowService->podeSerAbatido($cow));
 
         return $this->render('dashboard/index.html.twig', [

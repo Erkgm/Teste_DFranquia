@@ -30,20 +30,13 @@ class FarmService
     //valida e att fazenda
     public function update(Farm $farm): ?string
     {
-       $existing = $this->farmRepo->createQueryBuilder('f')
-           ->where('f.name =: name')
-           ->andWhere('f.id != id')
-           ->setParameter('name', $farm->getName())
-           ->setParameter('id', $farm->getId())
-           ->getQuery()
-           ->getOneOrNullResult();
+        $existing = $this->farmRepo->findByNameExcluding($farm->getName(), $farm->getId());
+        if ($existing) {
+            return "Já existe uma fazenda com o nome \"{$farm->getName()}\".";
+        }
 
-       if ($existing){
-           return "Já existe uma fazenda com o nome \"{$farm->getName()}\".";
-       }
-
-       $this->em->flush();
-       return null;
+        $this->em->flush();
+        return null;
     }
 
     //valida e remove farm

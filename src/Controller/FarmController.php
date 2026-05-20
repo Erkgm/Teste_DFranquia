@@ -28,16 +28,7 @@ class FarmController extends AbstractController
     {
         $search = $request->query -> get('search', '');
 
-        $qb = $search
-            ? $this->repo->createQueryBuilder('f')
-                ->where('LOWER(f.name) LIKE LOWER(:term)')
-                ->orWhere('LOWER(f.responsavel) LIKE LOWER(:term)')
-                ->setParameter('term', '%' . $search . '%')
-                ->orderBy('f.name', 'ASC')
-            : $this->repo->createQueryBuilder('f')
-            ->orderBy('f.name', 'ASC');
-
-        $pagination = $this->paginator->paginate($qb, $request->query->getInt('page', 1), 10);
+        $pagination = $this->paginator->paginate($this->repo->createListQueryBuilder($search), $request->query->getInt('page', 1), 10);
 
         return $this->render('farm/index.html.twig', [
             'pagination' => $pagination,
@@ -51,19 +42,19 @@ class FarmController extends AbstractController
     {
         $farm = new Farm();
         $form = $this->createForm(FarmType::class, $farm);
-        $form -> handleRequest($request);
+        $form->handleRequest($request);
 
-        if($form -> isSubmitted() && $form -> isValid()) {
+        if($form->isSubmitted() && $form->isValid()) {
             $error = $this->service->create($farm);
             if ($error){
                 $this->addFlash('danger', $error);
             } else{
-                $this -> addFlash('success', 'Fazenda cadastrado');
+                $this->addFlash('success', 'Fazenda cadastrado');
                 return $this->redirectToRoute('farm_index');
             }
         }
 
-        return $this -> render('farm/form.html.twig',[
+        return $this->render('farm/form.html.twig',[
             'form' => $form,
             'title' => 'Nova fazenda',
         ]);
@@ -73,20 +64,20 @@ class FarmController extends AbstractController
     #[Route('/{id}/editar', name: 'edit', methods: ['GET', 'POST'] )]
     public function edit(Farm $farm, Request $request): Response
     {
-        $form = $this -> createForm(FarmType::class, $farm);
-        $form -> handleRequest($request);
+        $form = $this->createForm(FarmType::class, $farm);
+        $form->handleRequest($request);
 
-        if($form -> isSubmitted() && $form -> isValid()){
+        if($form->isSubmitted() && $form->isValid()){
             $error = $this->service->update($farm);
             if ($error){
                 $this->addFlash('danger', $error);
             } else {
-                $this -> addFlash('success', 'Fazenda atualizada');
-                return $this -> redirectToRoute('farm_index');
+                $this->addFlash('success', 'Fazenda atualizada');
+                return $this->redirectToRoute('farm_index');
             }
         }
 
-        return $this -> render('farm/form.html.twig', [
+        return $this->render('farm/form.html.twig', [
             'form' => $form,
             'title' => 'Editar fazenda',
             'farm' => $farm,
@@ -97,16 +88,16 @@ class FarmController extends AbstractController
     #[Route('/{id}/excluir', name: 'delete', methods: ['POST'])]
     public function delete(Farm $farm, Request $request): Response
     {
-        if($this -> isCsrfTokenValid('delete-farm-' . $farm -> getId(), $request -> get('_token'))) {
+        if($this->isCsrfTokenValid('delete-farm-' . $farm->getId(), $request->get('_token'))) {
             $error = $this->service->delete($farm);
             if($error){
                 $this->addFlash('danger', $error);
             } else {
-                $this -> addFlash('success', 'Fazenda excluída');
+                $this->addFlash('success', 'Fazenda excluída');
             }
         }
 
-        return $this -> redirectToRoute('farm_index');
+        return $this->redirectToRoute('farm_index');
 
     }
 }

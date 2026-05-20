@@ -14,7 +14,7 @@ class CowRepository extends ServiceEntityRepository
     }
 
     //busca de todos os aniamis vivos
-    public function findTodosVivos(): array
+    public function findAllAlive(): array
     {
         return $this->createQueryBuilder('c')
             ->join('c.fazenda', 'f')
@@ -112,5 +112,20 @@ class CowRepository extends ServiceEntityRepository
         }
 
         return $qb->getQuery()->getOneOrNullResult();
+    }
+
+    //metodo do qb para listar com filtro opcional de fazenda
+    public function createListQueryBuilder(?int $farmId = null)
+    {
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.abatido = false')
+            ->orderBy('c.codigo', 'ASC');
+
+        if ($farmId){
+            $qb->join('c.fazenda', 'f')
+                ->andWhere('f.id = :farmId')
+                ->setParameter('farmId', $farmId);
+        }
+        return $qb;
     }
 }

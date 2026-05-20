@@ -53,7 +53,19 @@ class FarmRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findNameOrResponsavel(string $term): array
+    //busca fazenda por nome excluindo um id especifivo
+    public function findByNameExcluding(string $name, int $excludeId): ?Farm
+    {
+        return $this->createQueryBuilder('f')
+            ->where('f.name = :name')
+            ->andWhere('f.id != :id')
+            ->setParameter('name', $name)
+            ->setParameter('id', $excludeId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    public function findNameOrResponsable(string $term): array
     {
         return $this->createQueryBuilder('f')
             ->where('LOWER(f.name) LIKE LOWER(:term)')
@@ -62,5 +74,20 @@ class FarmRepository extends ServiceEntityRepository
             ->orderBy('f.name', 'ASC')
             ->getQuery()
             ->getResult();
+    }
+
+    //qb para listagem
+    public function createListQueryBuilder(?string $search = null)
+    {
+        $qb = $this->createQueryBuilder('f')
+            ->orderBy('f.name', 'ASC');
+
+        if ($search) {
+            $qb->where('LOWER(f.name) LIKE LOWER(:term)')
+                ->orWhere('LOWER(f.responsavel) LIKE LOWER(:term)')
+                ->setParameter('term', '%' . $search . '%');
+        }
+
+        return $qb;
     }
 }
