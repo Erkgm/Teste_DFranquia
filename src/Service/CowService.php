@@ -72,59 +72,72 @@ class CowService
     //valida e cadastra aimal
     public function create(Cow $cow): ?string
     {
-        // Valida cod unico
-        $existing = $this->cowRepo->findAnimalPorCod($cow->getCodigo());
-        if ($existing) {
-            return "Já existe um animal vivo com o código \"{$cow->getCodigo()}\".";
+        try{
+            $existing = $this->cowRepo->findAnimalPorCod($cow->getCodigo());
+            if ($existing) {
+                return "Já existe um animal vivo com o código \"{$cow->getCodigo()}\".";
+            }
+
+            $error = $this->validateFarmCapacity($cow->getFazenda());
+            if ($error) {
+                return $error;
+            }
+
+            $cow->setAbatido(false);
+            $this->em->persist($cow);
+            $this->em->flush();
+
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao cadastrar animal: " . $e->getMessage();
         }
 
-        // Valida capacidade da fazenda
-        $error = $this->validateFarmCapacity($cow->getFazenda());
-        if ($error) {
-            return $error;
-        }
-
-        $cow->setAbatido(false);
-        $this->em->persist($cow);
-        $this->em->flush();
-
-        return null;
     }
 
    //valida e att animal
-    public function update(Cow $cow): ?string
+    public function update(Cow $cow, ?int $oldFarmId = null): ?string
     {
-        $existing = $this->cowRepo->findAnimalPorCod($cow->getCodigo(), $cow->getId());
-        if ($existing) {
-            return "Já existe um animal vivo com o código \"{$cow->getCodigo()}\".";
-        }
-
-        $fazenda = $cow->getFazenda();
-        if($oldFarmId && $fazenda->getId() !== $oldFarmId){
-            if (!$fazenda->temCapacidade()){
-                return "A fazenda \"{$fazenda->getName()}\" atingiu a capacidade máxima de {$fazenda->getCapacidadeMaxima()} animais.";
+        try {
+            $existing = $this->cowRepo->findAnimalPorCod($cow->getCodigo(), $cow->getId());
+            if ($existing) {
+                return "Já existe um animal vivo com o código \"{$cow->getCodigo()}\"";
             }
+
+            $fazenda = $cow->getFazenda();
+            if ($oldFarmId && $fazenda->getId() !== $oldFarmId) {
+                if (!$fazenda->temCapacidade()) {
+                    return "A fazenda \"{$fazenda->getName()}\" atingiu a capacidade máxima de {$fazenda->getCapacidadeMaxima()} animais";
+                }
+            }
+
+            $this->em->flush();
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao atualizar animal: " . $e->getMessage();
         }
-        $this->em->flush();
-        return null;
     }
 
     //valida e abate animal
     public function slaughter(Cow $cow): ?string
     {
-        if ($cow->isAbatido()) {
-            return "O animal \"{$cow->getCodigo()}\" já foi abatido.";
+        try{
+            if ($cow->isAbatido()) {
+                return "O animal \"{$cow->getCodigo()}\" já foi abatido.";
+            }
+
+            if (!$this->podeSerAbatido($cow)) {
+                return "O animal \"{$cow->getCodigo()}\" não atende às condições de abate.";
+            }
+
+            $cow->setAbatido(true);
+            $cow->setAbatidoEm(new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')));
+            $this->em->flush();
+
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao realizar abate: " . $e->getMessage();
         }
 
-        if (!$this->podeSerAbatido($cow)) {
-            return "O animal \"{$cow->getCodigo()}\" não atende às condições de abate.";
-        }
-
-        $cow->setAbatido(true);
-        $cow->setAbatidoEm(new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')));
-        $this->em->flush();
-
-        return null;
     }
 
     //valida a cap da fazenda
