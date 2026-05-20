@@ -16,38 +16,52 @@ class FarmService
     //valida e cadastra fazenda
     public function create(Farm $farm): ?string
     {
-        $error = $this->validateUniqueName($farm->getName());
-        if($error){
-            return $error;
-        }
+        try {
+            $error = $this->validateUniqueName($farm->getName());
+            if($error){
+                return $error;
+            }
 
-        $this->em->persist($farm);
-        $this->em->flush();
-        return null;
+            $this->em->persist($farm);
+            $this->em->flush();
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao cadastrar fazenda: " . $e->getMessage();
+        }
     }
 
 
     //valida e att fazenda
     public function update(Farm $farm): ?string
     {
-        $existing = $this->farmRepo->findByNameExcluding($farm->getName(), $farm->getId());
-        if ($existing) {
-            return "Já existe uma fazenda com o nome \"{$farm->getName()}\".";
+        try {
+            $existing = $this->farmRepo->findByNameExcluding($farm->getName(), $farm->getId());
+            if ($existing) {
+                return "Já existe uma fazenda com o nome \"{$farm->getName()}\".";
+            }
+
+            $this->em->flush();
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao atualizar fazenda: " . $e->getMessage();
         }
 
-        $this->em->flush();
-        return null;
     }
 
     //valida e remove farm
     public function delete(Farm $farm): ?string
     {
-        if($farm->getAnimaisVivos()->count()>0){
-            return "Não é possível remover a fazenda \"{$farm->getName()}\", ela possui animais ";
+        try {
+            if($farm->getAnimaisVivos()->count()>0){
+                return "Não é possível remover a fazenda \"{$farm->getName()}\", ela possui animais ";
+            }
+            $this->em->remove($farm);
+            $this->em->flush();
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao remover fazenda: " . $e->getMessage();
         }
-        $this->em->remove($farm);
-        $this->em->flush();
-        return null;
+
     }
 
     private function validateUniqueName(string $name): ?string

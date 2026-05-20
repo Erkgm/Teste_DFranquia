@@ -16,35 +16,48 @@ class VeterinarianService
     //valida e cadastra veterinario
     public function create(Veterinarian $vet): ?string
     {
-        $error = $this->validateUniqueCrmv($vet->getCrmv());
-        if($error){
-            return $error;
+        try {
+            $error = $this->validateUniqueCrmv($vet->getCrmv());
+            if($error){
+                return $error;
+            }
+
+            $this->em->persist($vet);
+            $this->em->flush();
+
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao cadastrar veterinário: " . $e->getMessage();
         }
 
-        $this->em->persist($vet);
-        $this->em->flush();
-
-        return null;
     }
 
     //valida e att veterinario
     public function update(Veterinarian $vet): ?string
     {
-        $existing = $this->vetRepo->findByCrmvExcluding($vet->getCrmv(), $vet->getId());
-        if ($existing) {
-            return "Já existe um veterinário com o CRMV \"{$vet->getCrmv()}\".";
-        }
+        try {
+            $existing = $this->vetRepo->findByCrmvExcluding($vet->getCrmv(), $vet->getId());
+            if ($existing) {
+                return "Já existe um veterinário com o CRMV \"{$vet->getCrmv()}\".";
+            }
 
-        $this->em->flush();
-        return null;
+            $this->em->flush();
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao atualizar veterinário: " . $e->getMessage();
+        }
     }
 
     //valida e delete veterinario
     public function delete(Veterinarian $vet): ?string
     {
-        $this->em->remove($vet);
-        $this->em->flush();
-        return null;
+        try {
+            $this->em->remove($vet);
+            $this->em->flush();
+            return null;
+        } catch (\Exception $e) {
+            return "Erro ao remover veterinário: " . $e->getMessage();
+        }
     }
 
     public function validateUniqueCrmv(string $crmv): ?string
