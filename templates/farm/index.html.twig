@@ -25,7 +25,7 @@
             {% for farm in pagination %}
                 <tr>
                     <td>{{ farm.name }}</td>
-                    <td>{{ farm.tamanho }}</td>
+                    <td>{{ farm.tamanho|number_format(2, ',', '.') }} ha</td>
                     <td>{{ farm.responsavel }}</td>
                     <td>
                         {% for vet in farm.veterinarios %}

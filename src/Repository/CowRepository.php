@@ -99,8 +99,8 @@ class CowRepository extends ServiceEntityRepository
             ->getResult();
     }
 
-   //verifica animal com o memso cod
-    public function findAnimalPorCod(string $codigo, ?int $excludeId = null): ?Cow
+   //verifica animal com o memso cod excluindo id especifico na hora da edicao
+    public function findLiveByCode(string $codigo, ?int $excludeId = null): ?Cow
     {
         $qb = $this->createQueryBuilder('c')
             ->where('c.codigo = :codigo')
