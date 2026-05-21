@@ -73,7 +73,7 @@ class CowService
     public function create(Cow $cow): ?string
     {
         try{
-            $existing = $this->cowRepo->findAnimalPorCod($cow->getCodigo());
+            $existing = $this->cowRepo->findLiveByCode($cow->getCodigo());
             if ($existing) {
                 return "Já existe um animal vivo com o código \"{$cow->getCodigo()}\".";
             }
@@ -98,7 +98,7 @@ class CowService
     public function update(Cow $cow, ?int $oldFarmId = null): ?string
     {
         try {
-            $existing = $this->cowRepo->findAnimalPorCod($cow->getCodigo(), $cow->getId());
+            $existing = $this->cowRepo->findLiveByCode($cow->getCodigo(), $cow->getId());
             if ($existing) {
                 return "Já existe um animal vivo com o código \"{$cow->getCodigo()}\"";
             }

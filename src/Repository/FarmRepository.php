@@ -53,7 +53,7 @@ class FarmRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    //busca fazenda por nome excluindo um id especifivo
+    //busca fazenda por nome excluindo um id especifivo na edicao para verificar o mesmo nome
     public function findByNameExcluding(string $name, int $excludeId): ?Farm
     {
         return $this->createQueryBuilder('f')

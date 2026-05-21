@@ -35,7 +35,7 @@ class VeterinarianRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    //busca vet por crmv excluindo um id especifico
+    //busca vet por crmv excluindo um id especifico, para na edicao verificar se é unico
     public function findByCrmvExcluding(string $crmv, int $excludeId): ?Veterinarian
     {
         return $this->createQueryBuilder('v')

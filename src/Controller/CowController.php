@@ -112,17 +112,17 @@ class CowController extends AbstractController
     {
         $animals = $this->repo->findAllAlive();
 
-        $elegiveis = [];
+        $eligible = [];
         foreach ($animals as $cow) {
             if ($this->service->podeSerAbatido($cow)) {
-                $elegiveis[] = [
+                $eligible[] = [
                     'cow'     => $cow,
                     'motivos' => $this->service->getMotivoAbate($cow),
                 ];
             }
         }
         return $this->render('cow/slaughter_list.html.twig', [
-            'elegiveis' => $elegiveis,
+            'eligible' => $eligible,
         ]);
     }
 

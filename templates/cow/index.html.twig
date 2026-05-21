@@ -29,9 +29,10 @@
                     <td>{{ cow.codigo }}</td>
                     <td>{{ cow.fazenda.name }}</td>
                     <td>{{ cow.dataNascimento|date('d/m/Y') }}</td>
-                    <td>{{ cow.litrosLeitePorSemana }}</td>
-                    <td>{{ cow.racaoPorSemana }}</td>
-                    <td>{{ cow.peso }}</td>
+                    <!--formacao -->
+                    <td>{{ cow.litrosLeitePorSemana|number_format(2, ',', '.') }}</td>
+                    <td>{{ cow.racaoPorSemana|number_format(2, ',', '.') }}</td>
+                    <td>{{ cow.peso|number_format(2, ',', '.') }}</td>
                     <td>
                         <a href="{{ path('cow_edit', {id: cow.id}) }}" class="btn btn-sm btn-warning">Editar</a>
                         <form method="post" action="{{ path('cow_delete', {id: cow.id}) }}" class="d-inline"
