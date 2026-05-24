@@ -27,7 +27,7 @@ class Veterinarian
     /**
      * @var Collection<int, Farm>
      */
-    #[ORM\ManyToMany(targetEntity: Farm::class, mappedBy: 'veterinarios')]
+    #[ORM\ManyToMany(targetEntity: Farm::class, mappedBy: 'veterinarians')]
     private Collection $farms;
 
     public function __construct()
@@ -73,7 +73,7 @@ class Veterinarian
     {
         if (!$this->farms->contains($farm)) {
             $this->farms->add($farm);
-            $farm->addVeterinario($this);
+            $farm->addVeterinarian($this);
         }
 
         return $this;
@@ -82,7 +82,7 @@ class Veterinarian
     public function removeFarm(Farm $farm): static
     {
         if ($this->farms->removeElement($farm)) {
-            $farm->removeVeterinario($this);
+            $farm->removeVeterinarian($this);
         }
 
         return $this;

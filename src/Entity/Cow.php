@@ -13,11 +13,11 @@ use Symfony\Component\Validator\Context\ExecutionContextInterface;
 class Cow
 {
     public const ARROBA_KG = 15;
-    public const MAX_IDADE_ANOS = 5;
-    public const MIN_LEITE_SEMANA = 40;
-    public const MIN_LEITE_EFICIENCIA = 70;
-    public const MAX_RACAO_DIA = 50;
-    public const MAX_PESO_ARROBAS = 18;
+    public const MAX_AGE_YEARS = 5;
+    public const MIN_MILK_PER_WEEK = 40;
+    public const MIN_MILK_EFFICIENCY = 70;
+    public const MAX_RATION_PER_DAY = 50;
+    public const MAX_WEIGHT_ARROBAS = 18;
 
 
     #[ORM\Id]
@@ -27,37 +27,37 @@ class Cow
 
     #[ORM\Column(length: 50)]
     #[Assert\NotBlank(message: 'Código obrigatório')]
-    private ?string $codigo = null;
+    private ?string $code = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     #[Assert\NotBlank(message: 'Produção do leite é obrigatório')]
     #[Assert\PositiveOrZero(message: 'A quantidade não pode ser negatica')]
-    private ?string $litrosLeitePorSemana = null;
+    private ?string $milkLitersPerWeek = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     #[Assert\NotBlank(message: 'Quantidade de ração é obrigatório')]
     #[Assert\PositiveOrZero(message: 'A quantidade não pode ser negativa')]
-    private ?string $racaoPorSemana = null;
+    private ?string $rationKgPerWeek = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 8, scale: 2)]
     #[Assert\NotBlank(message: 'Peso é obrigatório')]
     #[Assert\PositiveOrZero(message: 'O peso não pode ser abaixo de 0')]
-    private ?string $peso = null;
+    private ?string $weightKg = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     #[Assert\NotBlank(message: 'Data de nascimento é obrigatório')]
-    private ?\DateTime $dataNascimento = null;
+    private ?\DateTime $birthDate = null;
 
     #[ORM\Column]
-    private ?bool $abatido = null;
+    private ?bool $slaughtered = null;
 
     #[ORM\Column(nullable: true)]
-    private ?\DateTime $abatidoEm = null;
+    private ?\DateTime $slaughteredAt = null;
 
     #[ORM\ManyToOne(inversedBy: 'cows')]
     #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotBlank(message: 'FAzenda é obrigatório')]
-    private ?Farm $fazenda = null;
+    private ?Farm $farm = null;
 
 
     public function getId(): ?int
@@ -65,133 +65,133 @@ class Cow
         return $this->id;
     }
 
-    public function getCodigo(): ?string
+    public function getCode(): ?string
     {
-        return $this->codigo;
+        return $this->code;
     }
 
-    public function setCodigo(string $codigo): static
+    public function setCode(string $code): static
     {
-        $this->codigo = strtoupper(trim($codigo));
+        $this->code = strtoupper(trim($code));
         return $this;
     }
 
-    public function getLitrosLeitePorSemana(): ?string
+    public function getMilkLitersPerWeek(): ?string
     {
-        return $this->litrosLeitePorSemana;
+        return $this->milkLitersPerWeek;
     }
 
-    public function setLitrosLeitePorSemana(string $v): static
+    public function setMilkLitersPerWeek(string $v): static
     {
-        $this->litrosLeitePorSemana = $v;
+        $this->milkLitersPerWeek = $v;
         return $this;
     }
 
-    public function getRacaoPorSemana(): ?string
+    public function getRationKgPerWeek(): ?string
     {
-        return $this->racaoPorSemana;
+        return $this->rationKgPerWeek;
     }
 
-    public function setRacaoPorSemana(string $v): static
+    public function setRationKgPerWeek(string $v): static
     {
-        $this->racaoPorSemana = $v;
+        $this->rationKgPerWeek = $v;
         return $this;
     }
 
-    public function getPeso(): ?string
+    public function getWeightKg(): ?string
     {
-        return $this->peso;
+        return $this->weightKg;
     }
 
-    public function setPeso(string $v): static
+    public function setWeightKg(string $v): static
     {
-        $this->peso = $v;
-
-        return $this;
-    }
-
-    public function getDataNascimento(): ?\DateTime
-    {
-        return $this->dataNascimento;
-    }
-
-    public function setDataNascimento(\DateTime $d): static
-    {
-        $this->dataNascimento = $d;
-        return $this;
-    }
-
-    public function isAbatido(): ?bool
-    {
-        return $this->abatido;
-    }
-
-    public function setAbatido(bool $v): static
-    {
-        $this->abatido = $v;
+        $this->weightKg = $v;
 
         return $this;
     }
 
-    public function getAbatidoEm(): ?\DateTime
+    public function getBirthDate(): ?\DateTime
     {
-        return $this->abatidoEm;
+        return $this->birthDate;
     }
 
-    public function setAbatidoEm(?\DateTime $v): static
+    public function setBirthDate(\DateTime $d): static
     {
-        $this->abatidoEm = $v;
+        $this->birthDate = $d;
+        return $this;
+    }
+
+    public function isSlaughtered(): ?bool
+    {
+        return $this->slaughtered;
+    }
+
+    public function setSlaughtered(bool $v): static
+    {
+        $this->slaughtered = $v;
 
         return $this;
     }
 
-    public function getFazenda(): ?Farm
+    public function getSlaughteredAt(): ?\DateTime
     {
-        return $this->fazenda;
+        return $this->slaughteredAt;
     }
 
-    public function setFazenda(?Farm $fazenda): static
+    public function setSlaughteredAt(?\DateTime $v): static
     {
-        $this->fazenda = $fazenda;
+        $this->slaughteredAt = $v;
+
+        return $this;
+    }
+
+    public function getFarm(): ?Farm
+    {
+        return $this->farm;
+    }
+
+    public function setFarm(?Farm $farm): static
+    {
+        $this->farm = $farm;
 
         return $this;
     }
 
     //validação para a datga de nascimento
     #[Assert\Callback]
-    public function validarDataNascimento(ExecutionContextInterface $context): void
+    public function validateBirthDate(ExecutionContextInterface $context): void
     {
-        if ($this->dataNascimento && $this->dataNascimento > new \DateTime()) {
+        if ($this->birthDate && $this->birthDate > new \DateTime()) {
             $context->buildViolation('A data de nascimento não pode ser futura.')
-                ->atPath('dataNascimento')
+                ->atPath('birthDate')
                 ->addViolation();
         }
     }
 
-    //Conversões
-    public function getPesoFloat():float{
-        return (float) $this ->peso;
+    //Conversões e validacao
+    public function getWeightFloat():float{
+        return (float) $this ->weightKg;
     }
 
-    public function getLeiteFloat():float{
-        return(float) $this->litrosLeitePorSemana;
+    public function getMilkFloat():float{
+        return(float) $this->milkLitersPerWeek;
     }
 
     public function getRacaoFloat():float{
-        return (float) $this->racaoPorSemana;
+        return (float) $this->rationKgPerWeek;
     }
 
-    public function getPesoEmArrobas():float{
-        return $this ->getPesoFloat() / self::ARROBA_KG;
+    public function getWeightInArrobas():float{
+        return $this ->getWeightFloat() / self::ARROBA_KG;
     }
 
-    public function getRacaoPorDia():float{
+    public function getRationPerDay():float{
         return $this ->getRacaoFloat() / 7;
     }
 
-    public function getIdadeEmAnos():float{
-        if(!$this->dataNascimento) return 0;
-        $diff = (new \DateTime()) -> diff($this->dataNascimento);
+    public function getAgeInYears():float{
+        if(!$this->birthDate) return 0;
+        $diff = (new \DateTime()) -> diff($this->birthDate);
         return $diff->y + ($diff->m / 12);
     }
 }

@@ -20,16 +20,16 @@ class FarmType extends AbstractType
                 'label' => 'Nome',
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Nome da fazenda'],
             ])
-            ->add('responsavel', TextType::class, [
+            ->add('responsible', TextType::class, [
                 'label' => 'Responsável',
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Nome do responsável'],
             ])
-            ->add('tamanho', NumberType::class ,[
+            ->add('size', NumberType::class ,[
                 'label' => 'Tamanho(hectares)',
                 'scale' => 2,
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Ex: 150.50'],
             ])
-            ->add('veterinarios', EntityType::class, [
+            ->add('veterinarians', EntityType::class, [
                 'class' => Veterinarian::class,
                 'choice_label' => 'name',
                 'multiple' => true,

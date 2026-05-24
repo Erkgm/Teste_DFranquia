@@ -11,28 +11,28 @@
                         <h4>{{ title }}</h4>
                     </div>
                     <div class="card-body">
-                        {{ form_start(form) }}
+                        {{ form_start(form, {'action': farm is defined ? path('farm_edit', {id: farm.id}) : path('farm_new'), 'method': 'POST'}) }}
                         <div class="mb-3">
                             {{ form_label(form.name) }}
                             {{ form_widget(form.name) }}
                             {{ form_errors(form.name) }}
                         </div>
                         <div class="mb-3">
-                            {{ form_label(form.tamanho) }}
-                            {{ form_widget(form.tamanho) }}
-                            {{ form_errors(form.tamanho) }}
+                            {{ form_label(form.size) }}
+                            {{ form_widget(form.size) }}
+                            {{ form_errors(form.size) }}
                             <div class="form-text">Capacidade = tamanho × 18 animais/ha</div>
                         </div>
                         <div class="mb-3">
-                            {{ form_label(form.responsavel) }}
-                            {{ form_widget(form.responsavel) }}
-                            {{ form_errors(form.responsavel) }}
+                            {{ form_label(form.responsible) }}
+                            {{ form_widget(form.responsible) }}
+                            {{ form_errors(form.responsible) }}
                         </div>
                         <div class="mb-3">
-                            {{ form_label(form.veterinarios) }}
-                            {{ form_widget(form.veterinarios) }}
-                            {{ form_errors(form.veterinarios) }}
-                            {{ form_help(form.veterinarios) }}
+                            {{ form_label(form.veterinarians) }}
+                            {{ form_widget(form.veterinarians) }}
+                            {{ form_errors(form.veterinarians) }}
+                            {{ form_help(form.veterinarians) }}
                         </div>
                         <div class="d-flex gap-2">
                             <button type="submit" class="btn btn-success">Salvar</button>

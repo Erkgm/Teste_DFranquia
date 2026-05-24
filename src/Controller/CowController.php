@@ -65,12 +65,12 @@ class CowController extends AbstractController
     #[Route('/{id}/editar', name: 'edit', methods: ['GET', 'POST'])]
     public function edit(Cow $cow, Request $request): Response
     {
-        if ($cow->isAbatido()) {
+        if ($cow->isSlaughtered()) {
             $this->addFlash('warning', 'Animais abatidos não podem ser editados');
             return $this->redirectToRoute('cow_index');
         }
 
-        $oldFarmId = $cow->getFazenda()?->getId();
+        $oldFarmId = $cow->getFarm()?->getId();
 
         $form = $this->createForm(CowType::class, $cow);
         $form->handleRequest($request);
@@ -97,10 +97,10 @@ class CowController extends AbstractController
     public function delete(Cow $cow, Request $request): Response
     {
         if ($this->isCsrfTokenValid('delete-cow-' . $cow->getId(), $request->get('_token'))) {
-            $codigo = $cow->getCodigo();
+            $code = $cow->getCode();
             $this->repo->getEntityManager()->remove($cow);
             $this->repo->getEntityManager()->flush();
-            $this->addFlash('success', "Animal \"{$codigo}\" removido");
+            $this->addFlash('success', "Animal \"{$code}\" removido");
         }
 
         return $this->redirectToRoute('cow_index');
@@ -114,10 +114,10 @@ class CowController extends AbstractController
 
         $eligible = [];
         foreach ($animals as $cow) {
-            if ($this->service->podeSerAbatido($cow)) {
+            if ($this->service->canBeSlaughtered($cow)) {
                 $eligible[] = [
                     'cow'     => $cow,
-                    'motivos' => $this->service->getMotivoAbate($cow),
+                    'reasons' => $this->service->getSlaughterReasons($cow),
                 ];
             }
         }
@@ -130,7 +130,7 @@ class CowController extends AbstractController
     #[Route('/{id}/abater', name: 'slaughter', methods: ['POST'])]
     public function slaughter(Cow $cow, Request $request): Response
     {
-        if (!$this->isCsrfTokenValid('abate-' . $cow->getId(), $request->get('_token'))) {
+        if (!$this->isCsrfTokenValid('slaughter-' . $cow->getId(), $request->get('_token'))) {
             $this->addFlash('danger', 'Token inválido.');
             return $this->redirectToRoute('cow_slaughter_list');
         }
@@ -139,7 +139,7 @@ class CowController extends AbstractController
         if ($error) {
             $this->addFlash('danger', $error);
         } else {
-            $this->addFlash('success', "Animal \"{$cow->getCodigo()}\" enviado para abate");
+            $this->addFlash('success', "Animal \"{$cow->getCode()}\" enviado para abate");
         }
 
         return $this->redirectToRoute('cow_slaughter_list');

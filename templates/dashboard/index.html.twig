@@ -12,7 +12,7 @@
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
                         <div class="text-muted small">Animais vivos</div>
-                        <div class="fw-bold fs-4">{{ totalAnimais }}</div>
+                        <div class="fw-bold fs-4">{{ totalAnimals }}</div>
                     </div>
                 </div>
             </div>
@@ -20,7 +20,7 @@
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
                         <div class="text-muted small">Fazendas</div>
-                        <div class="fw-bold fs-4">{{ totalFazendas }}</div>
+                        <div class="fw-bold fs-4">{{ totalFarms }}</div>
                     </div>
                 </div>
             </div>
@@ -33,11 +33,11 @@
                 </div>
             </div>
             <div class="col-sm-6 col-xl-3">
-                <div class="card border-0 shadow-sm h-100 {{ totalElegiveis > 0 ? 'border-danger' : '' }}">
+                <div class="card border-0 shadow-sm h-100 {{ totalEligible > 0 ? 'border-danger' : '' }}">
                     <div class="card-body">
                         <div class="text-muted small">Elegíveis para abate</div>
-                        <div class="fw-bold fs-4 {{ totalElegiveis > 0 ? 'text-danger' : '' }}">{{ totalElegiveis }}</div>
-                        {% if totalElegiveis > 0 %}
+                        <div class="fw-bold fs-4 {{ totalEligible > 0 ? 'text-danger' : '' }}">{{ totalEligible }}</div>
+                        {% if totalEligible > 0 %}
                             <a href="{{ path('cow_slaughter_list') }}" class="small text-danger">Ver lista →</a>
                         {% endif %}
                     </div>
@@ -51,16 +51,16 @@
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <h6 class="text-muted">Total de Leite / Semana</h6>
-                        <div class="fw-bold fs-3 text-success">{{ totalLeite|number_format(2, ',', '.') }} L</div>
+                        <h6 class="text-muted"> Total de Leite / Semana</h6>
+                        <div class="fw-bold fs-3 text-success">{{ totalMilk|number_format(2, ',', '.') }} L</div>
                     </div>
                 </div>
             </div>
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
-                        <h6 class="text-muted">Total de Ração / Semana</h6>
-                        <div class="fw-bold fs-3 text-warning">{{ totalRacao|number_format(2, ',', '.') }} kg</div>
+                        <h6 class="text-muted"> Total de Ração / Semana</h6>
+                        <div class="fw-bold fs-3 text-warning">{{ totalRation|number_format(2, ',', '.') }} kg</div>
                     </div>
                 </div>
             </div>
@@ -69,10 +69,10 @@
         <!-- Animal jovem com alto consumo-->
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white">
-                <h6 class="mb-0"> Animais com até 1 ano e consumo e de 500kg de ração/semana</h6>
+                <h6 class="mb-0"> Animais com até 1 ano e consumo && 500kg de ração/semana</h6>
             </div>
             <div class="card-body p-0">
-                {% if jovensAltoConsumo|length == 0 %}
+                {% if youngHeavyEaters|length == 0 %}
                     <div class="p-3 text-muted">Nenhum animal nessa condição.</div>
                 {% else %}
                     <table class="table table-hover mb-0">
@@ -86,13 +86,13 @@
                         </tr>
                         </thead>
                         <tbody>
-                        {% for animal in jovensAltoConsumo %}
+                        {% for animal in youngHeavyEaters %}
                             <tr>
-                                <td><span class="badge bg-warning text-dark">{{ animal.codigo }}</span></td>
-                                <td>{{ animal.fazenda.name }}</td>
-                                <td>{{ animal.dataNascimento|date('d/m/Y') }}</td>
-                                <td>{{ animal.racaoPorSemana }}</td>
-                                <td>{{ animal.litrosLeitePorSemana }}</td>
+                                <td><span class="badge bg-warning text-dark">{{ animal.code }}</span></td>
+                                <td>{{ animal.farm.name }}</td>
+                                <td>{{ animal.birthDate|date('d/m/Y') }}</td>
+                                <td>{{ animal.rationKgPerWeek|number_format(2, ',', '.') }}</td>
+                                <td>{{ animal.milkLitersPerWeek|number_format(2, ',', '.') }}</td>
                             </tr>
                         {% endfor %}
                         </tbody>

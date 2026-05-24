@@ -21,15 +21,15 @@ class DashBoardController extends AbstractController
         CowService $cowService,
     ): Response {
         $animalsAlive = $cowRepo->findAllAlive();
-        $elegiveis = array_filter($animalsAlive, fn($cow) => $cowService->podeSerAbatido($cow));
+        $eligible  = array_filter($animalsAlive, fn($cow) => $cowService->canBeSlaughtered($cow));
 
         return $this->render('dashboard/index.html.twig', [
-            'totalLeite'        => $cowRepo->getTotalLeitePorSemana(),
-            'totalRacao'        => $cowRepo->getTotalRacaoPorSemana(),
-            'jovensAltoConsumo' => $cowRepo->findJovemAltoConsumo(),
-            'totalElegiveis'    => count($elegiveis),
-            'totalAnimais'      => count($animalsAlive),
-            'totalFazendas'     => count($farmRepo->findAll()),
+            'totalMilk'        => $cowRepo->getTotalMilkPerWeek(),
+            'totalRation'        => $cowRepo->getTotalRationPerWeek(),
+            'youngHeavyEaters' => $cowRepo->findYoungHeavyEaters(),
+            'totalEligible'    => count($eligible ),
+            'totalAnimals'      => count($animalsAlive),
+            'totalFarms'     => count($farmRepo->findAll()),
             'totalVets'         => count($vetRepo->findAll()),
         ]);
     }

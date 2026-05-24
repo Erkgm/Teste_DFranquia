@@ -25,10 +25,10 @@
             {% for farm in pagination %}
                 <tr>
                     <td>{{ farm.name }}</td>
-                    <td>{{ farm.tamanho|number_format(2, ',', '.') }} ha</td>
-                    <td>{{ farm.responsavel }}</td>
+                    <td>{{ farm.size|number_format(2, ',', '.') }} ha</td>
+                    <td>{{ farm.responsible }}</td>
                     <td>
-                        {% for vet in farm.veterinarios %}
+                        {% for vet in farm.veterinarians %}
                             <span class="badge bg-success">{{ vet.name }}</span>
                         {% else %}
                             <span class="text-muted">Nenhum</span>
@@ -37,7 +37,7 @@
                     <td>
                         <a href="{{ path('farm_edit', {id: farm.id}) }}" class="btn btn-sm btn-warning">Editar</a>
                         <form method="post" action="{{ path('farm_delete', {id: farm.id}) }}" class="d-inline"
-                              onsubmit="return confirm('Confirmar a exclusão')">
+                              data-confirm="Deseja excluir a fazenda {{ farm.name }}?">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete-farm-' ~ farm.id) }}">
                             <button class="btn btn-sm btn-danger">Excluir</button>
                         </form>

@@ -26,17 +26,16 @@
             <tbody>
             {% for cow in pagination %}
                 <tr>
-                    <td>{{ cow.codigo }}</td>
-                    <td>{{ cow.fazenda.name }}</td>
-                    <td>{{ cow.dataNascimento|date('d/m/Y') }}</td>
-                    <!--formacao -->
-                    <td>{{ cow.litrosLeitePorSemana|number_format(2, ',', '.') }}</td>
-                    <td>{{ cow.racaoPorSemana|number_format(2, ',', '.') }}</td>
-                    <td>{{ cow.peso|number_format(2, ',', '.') }}</td>
+                    <td>{{ cow.code }}</td>
+                    <td>{{ cow.farm.name }}</td>
+                    <td>{{ cow.birthDate|date('d/m/Y') }}</td>
+                    <td>{{ cow.milkLitersPerWeek|number_format(2, ',', '.') }}</td>
+                    <td>{{ cow.rationKgPerWeek|number_format(2, ',', '.') }}</td>
+                    <td>{{ cow.weightKg|number_format(2, ',', '.') }}</td>
                     <td>
                         <a href="{{ path('cow_edit', {id: cow.id}) }}" class="btn btn-sm btn-warning">Editar</a>
                         <form method="post" action="{{ path('cow_delete', {id: cow.id}) }}" class="d-inline"
-                              onsubmit="return confirm('Confirme a exclusão')">
+                              data-confirm="Deseja excluir o animal {{ cow.code }}?">
                             <input type="hidden" name="_token" value="{{ csrf_token('delete-cow-' ~ cow.id) }}">
                             <button class="btn btn-sm btn-danger">Excluir</button>
                         </form>

@@ -16,60 +16,6 @@ class VeterinarianRepository extends ServiceEntityRepository
         parent::__construct($registry, Veterinarian::class);
     }
 
-    //busca todos vet por ordem
-    public function findAllOrderedByName(): array
-    {
-        return $this->createQueryBuilder('v')
-            ->orderBy('v.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    //busca por cmrv
-    public function findByCrmv(string $crmv): ?Veterinarian
-    {
-        return $this->createQueryBuilder('v')
-            ->where('v.crmv = :crmv')
-            ->setParameter('crmv', strtoupper(trim($crmv)))
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    //busca vet por crmv excluindo um id especifico, para na edicao verificar se é unico
-    public function findByCrmvExcluding(string $crmv, int $excludeId): ?Veterinarian
-    {
-        return $this->createQueryBuilder('v')
-            ->where('v.crmv = :crmv')
-            ->andWhere('v.id != :id')
-            ->setParameter('crmv', strtoupper(trim($crmv)))
-            ->setParameter('id', $excludeId)
-            ->getQuery()
-            ->getOneOrNullResult();
-    }
-
-    //busca por nome ou crmv
-    public function findByNameOrCrmv(string $term): array
-    {
-        return $this->createQueryBuilder('v')
-            ->where('LOWER(v.name) LIKE LOWER(:term)')
-            ->orWhere('LOWER(v.crmv) LIKE LOWER(:term)')
-            ->setParameter('term', '%' . $term . '%')
-            ->orderBy('v.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
-    //busca todos com ligados a fazenda
-    public function findAllWithFarms(): array
-    {
-        return $this->createQueryBuilder('v')
-            ->leftJoin('v.farms', 'f')
-            ->addSelect('f')
-            ->orderBy('v.name', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
-
     //qb para listagem
     public function createListQueryBuilder(?string $search = null)
     {
@@ -84,5 +30,28 @@ class VeterinarianRepository extends ServiceEntityRepository
 
         return $qb;
     }
+
+    //busca vet por crmv excluindo um id especifico, para na edicao verificar se é unico
+    public function findByCrmvExcluding(string $crmv, int $excludeId): ?Veterinarian
+    {
+        return $this->createQueryBuilder('v')
+            ->where('v.crmv = :crmv')
+            ->andWhere('v.id != :id')
+            ->setParameter('crmv', strtoupper(trim($crmv)))
+            ->setParameter('id', $excludeId)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    //busca por cmrv
+    public function findByCrmv(string $crmv): ?Veterinarian
+    {
+        return $this->createQueryBuilder('v')
+            ->where('v.crmv = :crmv')
+            ->setParameter('crmv', strtoupper(trim($crmv)))
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
 
 }

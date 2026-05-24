@@ -23,22 +23,22 @@ class Farm
 
     #[ORM\Column(length: 150)]
     #[Assert\NotBlank(message: 'Informe o responsável da fazenda')]
-    private ?string $responsavel = null;
+    private ?string $responsible = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 10, scale: 2)]
     #[Assert\NotBlank(message: 'O tamanho é obrigatório.')]
     #[Assert\Positive(message: 'O tamanho deve ser maior que zero.')]
-    private ?string $tamanho = null;
+    private ?string $size = null;
 
     #[ORM\ManyToMany(targetEntity: Veterinarian::class, inversedBy: 'farms')]
-    private Collection $veterinarios;
+    private Collection $veterinarians;
 
-    #[ORM\OneToMany(targetEntity: Cow::class, mappedBy: 'fazenda')]
+    #[ORM\OneToMany(targetEntity: Cow::class, mappedBy: 'farm')]
     private Collection $cows;
 
     public function __construct()
     {
-        $this->veterinarios = new ArrayCollection();
+        $this->veterinarians = new ArrayCollection();
         $this->cows = new ArrayCollection();
     }
 
@@ -59,47 +59,47 @@ class Farm
         return $this;
     }
 
-    public function getResponsavel(): ?string
+    public function getResponsible(): ?string
     {
-        return $this->responsavel;
+        return $this->responsible;
     }
 
-    public function setResponsavel(string $responsavel): static
+    public function setResponsible(string $responsible): static
     {
-        $this->responsavel = $responsavel;
+        $this->responsible = $responsible;
 
         return $this;
     }
 
-    public function getTamanho(): ?string
+    public function getSize(): ?string
     {
-        return $this->tamanho;
+        return $this->size;
     }
 
-    public function setTamanho(string $tamanho): static
+    public function setSize(string $size): static
     {
-        $this->tamanho = $tamanho;
+        $this->size = $size;
 
         return $this;
     }
 
-    public function getVeterinarios(): Collection
+    public function getVeterinarians(): Collection
     {
-        return $this->veterinarios;
+        return $this->veterinarians;
     }
 
-    public function addVeterinario(Veterinarian $veterinario): static
+    public function addVeterinarian(Veterinarian $veterinarian): static
     {
-        if (!$this->veterinarios->contains($veterinario)) {
-            $this->veterinarios->add($veterinario);
+        if (!$this->veterinarians->contains($veterinarian)) {
+            $this->veterinarians->add($veterinarian);
         }
 
         return $this;
     }
 
-    public function removeVeterinario(Veterinarian $veterinario): static
+    public function removeVeterinarian(Veterinarian $veterinarian): static
     {
-        $this->veterinarios->removeElement($veterinario);
+        $this->veterinarians->removeElement($veterinarian);
 
         return $this;
     }
@@ -113,7 +113,7 @@ class Farm
     {
         if (!$this->cows->contains($cow)) {
             $this->cows->add($cow);
-            $cow->setFazenda($this);
+            $cow->setFarm($this);
         }
 
         return $this;
@@ -122,8 +122,8 @@ class Farm
     public function removeCow(Cow $cow): static
     {
         if ($this->cows->removeElement($cow)) {
-            if ($cow->getFazenda() === $this) {
-                $cow->setFazenda(null);
+            if ($cow->getFarm() === $this) {
+                $cow->setFarm(null);
             }
         }
 
@@ -133,22 +133,22 @@ class Farm
 
     //Regras
     //quantidade de animal e que esteja vivo
-    public function getTamanhoFloat(): float{
-        return (float) $this->tamanho;
+    public function getSizeFloat(): float{
+        return (float) $this->size;
     }
 
     //max de 18 animal por hectare
-    public function getCapacidadeMaxima():int{
-        return (int) floor($this -> getTamanhoFloat() * 18);
+    public function getMaxCapacity():int{
+        return (int) floor($this -> getSizeFloat() * 18);
     }
 
     //retorna apenas animais vivos
-    public function getAnimaisVivos(): Collection{
-        return $this->cows->filter(fn(Cow $c) => !$c->isAbatido());
+    public function getLiveAnimals(): Collection{
+        return $this->cows->filter(fn(Cow $c) => !$c->isSlaughtered());
     }
 
     //Ve se a fazenda tem capacidade
-    public function temCapacidade(): bool{
-        return  $this->getAnimaisVivos()->count() < $this->getCapacidadeMaxima();
+    public function hasCapacity(): bool{
+        return  $this->getLiveAnimals()->count() < $this->getMaxCapacity();
     }
 }
