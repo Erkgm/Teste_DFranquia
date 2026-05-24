@@ -44,24 +44,6 @@ class FarmRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-//   //busca as fazendas com os veterinario
-//   public function findAllWithVet():array
-//   {
-//       return $this->createQueryBuilder('f')
-//           ->leftJoin('f.veterinarios', 'v')
-//           ->addSelect('v')
-//           ->orderBy('f.name', 'ASC')
-//           ->getQuery()
-//           ->getResult();
-//   }
-//
-//   //busca de fazenda com capacidade disponivel
-//   public function findFarmWithCap(): array
-//   {
-//       $farms = $this->findAllWithVet();
-//       return array_filter($farms, fn(Farm $f) => $f->hasCapacity());
-//   }
-
    //busca pelo nome exato da fazenda
     public function findExactName(string $name): ?Farm
     {
