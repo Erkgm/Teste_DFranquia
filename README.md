@@ -5,7 +5,7 @@
 
 ##  Como iniciar o projeto
 
-### Dependências
+### Dependências / pré-requisitos
 - [Docker Desktop](https://www.docker.com/products/docker-desktop/) instalado
 - [Git](https://git-scm.com/downloads) instalado
 - Symfony 6.4 instalado
@@ -35,6 +35,7 @@ docker exec fazenda_php php bin/console doctrine:migrations:sync-metadata-storag
 ```bash
 docker exec fazenda_php php bin/console doctrine:migrations:migrate --no-interaction
 ```
+
 
 **5. Acesse o sistema:**
 http://localhost:8080
@@ -85,5 +86,21 @@ Um animal é elegível para abate quando atende ao menos uma das condições:
 - Total de ração consumida por semana
 - Animais com até 1 ano e consumo > 500kg ração/semana
 - Contagem de animais elegíveis para abate
+
+### Alterações
+
+**`createListQueryBuilder`** nos repositories — para centralizar as queries de listagem com filtro/busca, evitando duplicação entre controller e service.
+
+**`findByNameExcluding` / `findByCrmvExcluding` / `findLiveByCode`** — ao editar um registro, a validação de unicidade precisa ignorar o próprio registro sendo editado. Sem os métodos, salvar sem alterar o nome/CRMV geraria falso positivo de duplicidade.
+
+**Por que `findByNameExcluding` em vez de `findOneBy(['name' => $name])`**? — o método padrão `findOneBy`e estava buscando qualquer registro com aquele nome no banco. No fluxo de edição, se o usuário salvasse sem alterar o nome, o sistema encontraria o próprio registro e retornaria erro de duplicidade. O método `findByNameExcluding` adiciona um `AND id != :id` na query, ignorando o registro atual e evitando esse falso positivo. O mesmo ao `findByCrmvExcluding` para veterinários e ao `findLiveByCode` com `excludeId` para animais.
+
+**`CowService`** — concentra todas as regras de abate (`canBeSlaughtered`, `getSlaughterReasons`) separadas da Entity
+
+**`try/catch` nos services — garantindo erros inesperados do banco sejam capturados e retornados como mensagem ao usuário
+
+
+
+---
 
 
