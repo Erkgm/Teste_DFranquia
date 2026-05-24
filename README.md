@@ -36,6 +36,11 @@ docker exec fazenda_php php bin/console doctrine:migrations:sync-metadata-storag
 docker exec fazenda_php php bin/console doctrine:migrations:migrate --no-interaction
 ```
 
+> As migrations em ordem:
+> - ..17 cria todas as tabelas do banco
+> - ..55 padronização dos nomes das colunas para inglês
+> - ..56 popula o banco com dados de exemplo para testes
+
 
 **5. Acesse o sistema:**
 http://localhost:8080
