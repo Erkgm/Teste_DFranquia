@@ -46,8 +46,8 @@ http://localhost:8080
 | Comando | Descrição |
 |---|---|
 | `docker compose -f compose.yaml up -d` | Inicia os containers |
-| `docker compose -f compose.yaml stop` | Para os containers (mantém dados) |
-| `docker compose -f compose.yaml down` | Remove os containers (mantém dados) |
+| `docker compose -f compose.yaml stop` | Para os containers  |
+| `docker compose -f compose.yaml down` | Remove os containers  |
 | `docker compose -f compose.yaml down -v` | Remove containers e dados |
 | `docker compose -f compose.yaml ps` | Lista containers em execução |
 | `docker exec fazenda_php php bin/console cache:clear` | Limpa o cache |
@@ -56,7 +56,7 @@ http://localhost:8080
 
 ##  Funcionalidades
 
-### Cadastros (CRUD completo)
+### Cadastros 
 - **Veterinários** — Nome e CRMV único
 - **Fazendas** — Nome único, tamanho em hectares, responsável, vínculo com veterinários (N:N)
 - **Animais** — Código único, leite, ração, peso, nascimento, fazenda (N:1)

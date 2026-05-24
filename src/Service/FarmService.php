@@ -52,7 +52,7 @@ class FarmService
     public function delete(Farm $farm): ?string
     {
         try {
-            if($farm->getAnimaisVivos()->count()>0){
+            if($farm->getLiveAnimals()->count()>0){
                 return "Não é possível remover a fazenda \"{$farm->getName()}\", ela possui animais ";
             }
             $this->em->remove($farm);

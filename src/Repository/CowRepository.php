@@ -17,95 +17,85 @@ class CowRepository extends ServiceEntityRepository
     public function findAllAlive(): array
     {
         return $this->createQueryBuilder('c')
-            ->join('c.fazenda', 'f')
+            ->join('c.farm', 'f')
             ->addSelect('f')
-            ->where('c.abatido = false')
+            ->where('c.slaughtered = false')
             ->orderBy('f.name', 'ASC')
-            ->addOrderBy('c.codigo', 'ASC')
+            ->addOrderBy('c.code', 'ASC')
             ->getQuery()
             ->getResult();
     }
 
-    //animais vivos por fazenda
-    public function findVivosPorFarm(int $farmId): array
+    //metodo do qb para listar com filtro opcional de fazenda
+    public function createListQueryBuilder(?int $farmId = null)
     {
-        return $this->createQueryBuilder('c')
-            ->join('c.fazenda', 'f')
-            ->where('c.abatido = false')
-            ->andWhere('f.id = :farmId')
-            ->setParameter('farmId', $farmId)
-            ->orderBy('c.codigo', 'ASC')
-            ->getQuery()
-            ->getResult();
-    }
+        $qb = $this->createQueryBuilder('c')
+            ->where('c.slaughtered = false')
+            ->orderBy('c.code', 'ASC');
 
-    //busca de animais prontos para abate
-    public function findProntosParaAbate(): array
-    {
-        return $this->createQueryBuilder('c')
-            ->join('c.fazenda', 'f')
-            ->addSelect('f')
-            ->where('c.abatido = false')
-            ->orderBy('f.name', 'ASC')
-            ->getQuery()
-            ->getResult();
+        if ($farmId) {
+            $qb->join('c.farm', 'f')
+                ->andWhere('f.id = :farmId')
+                ->setParameter('farmId', $farmId);
+        }
+        return $qb;
     }
 
     //busca de animais abatidos
-    public function findTodosAbatidos(): array
+    public function findAllSlaughtered(): array
     {
         return $this->createQueryBuilder('c')
-            ->join('c.fazenda', 'f')
+            ->join('c.farm', 'f')
             ->addSelect('f')
-            ->where('c.abatido = true')
-            ->orderBy('c.abatidoEm', 'DESC')
+            ->where('c.slaughtered = true')
+            ->orderBy('c.slaughteredAt', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
    //total de leite por semana
-    public function getTotalLeitePorSemana(): float
+    public function getTotalMilkPerWeek(): float
     {
         return (float) $this->createQueryBuilder('c')
-            ->select('SUM(c.litrosLeitePorSemana)')
-            ->where('c.abatido = false')
+            ->select('SUM(c.milkLitersPerWeek)')
+            ->where('c.slaughtered = false')
             ->getQuery()
             ->getSingleScalarResult() ?? 0;
     }
 
     //total de racao por semana
-    public function getTotalRacaoPorSemana(): float
+    public function getTotalRationPerWeek(): float
     {
         return (float) $this->createQueryBuilder('c')
-            ->select('SUM(c.racaoPorSemana)')
-            ->where('c.abatido = false')
+            ->select('SUM(c.rationKgPerWeek)')
+            ->where('c.slaughtered = false')
             ->getQuery()
             ->getSingleScalarResult() ?? 0;
     }
 
     //animal jovem com 1 ano e que tenha consumo mais que 500kg/semana
-    public function findJovemAltoConsumo(): array
+    public function findYoungHeavyEaters(): array
     {
-        $umAnoAtras = new \DateTime('-1 year');
+        $oneYearAgo = new \DateTime('-1 year');
 
         return $this->createQueryBuilder('c')
-            ->where('c.abatido = false')
-            ->andWhere('c.dataNascimento >= :umAnoAtras')
-            ->andWhere('c.racaoPorSemana > :consumo')
-            ->setParameter('umAnoAtras', $umAnoAtras)
-            ->setParameter('consumo', 500)
-            ->orderBy('c.dataNascimento', 'DESC')
+            ->where('c.slaughtered = false')
+            ->andWhere('c.birthDate >= :oneYearAgo')
+            ->andWhere('c.rationKgPerWeek > :consumption')
+            ->setParameter('oneYearAgo', $oneYearAgo)
+            ->setParameter('consumption', 500)
+            ->orderBy('c.birthDate', 'DESC')
             ->getQuery()
             ->getResult();
     }
 
    //verifica animal com o memso cod excluindo id especifico na hora da edicao
-    public function findLiveByCode(string $codigo, ?int $excludeId = null): ?Cow
+    public function findLiveByCode(string $code, ?int $excludeId = null): ?Cow
     {
         $qb = $this->createQueryBuilder('c')
-            ->where('c.codigo = :codigo')
-            ->andWhere('c.abatido = false')
-            ->setParameter('codigo', strtoupper(trim($codigo)));
+            ->where('c.code = :code')
+            ->andWhere('c.slaughtered = false')
+            ->setParameter('code', strtoupper(trim($code)));
 
         if ($excludeId) {
             $qb->andWhere('c.id != :id')->setParameter('id', $excludeId);
@@ -114,18 +104,5 @@ class CowRepository extends ServiceEntityRepository
         return $qb->getQuery()->getOneOrNullResult();
     }
 
-    //metodo do qb para listar com filtro opcional de fazenda
-    public function createListQueryBuilder(?int $farmId = null)
-    {
-        $qb = $this->createQueryBuilder('c')
-            ->where('c.abatido = false')
-            ->orderBy('c.codigo', 'ASC');
 
-        if ($farmId){
-            $qb->join('c.fazenda', 'f')
-                ->andWhere('f.id = :farmId')
-                ->setParameter('farmId', $farmId);
-        }
-        return $qb;
-    }
 }

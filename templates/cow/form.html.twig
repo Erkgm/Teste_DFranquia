@@ -14,34 +14,34 @@
                         {{ form_start(form, {'action': cow is defined ? path('cow_edit', {id: cow.id}) : path('cow_new'), 'method': 'POST'}) }}
                         <div class="row g-3">
                             <div class="col-md-6">
-                                {{ form_label(form.codigo) }}
-                                {{ form_widget(form.codigo) }}
-                                {{ form_errors(form.codigo) }}
+                                {{ form_label(form.code) }}
+                                {{ form_widget(form.code) }}
+                                {{ form_errors(form.code) }}
                             </div>
                             <div class="col-md-6">
-                                {{ form_label(form.dataNascimento) }}
-                                {{ form_widget(form.dataNascimento) }}
-                                {{ form_errors(form.dataNascimento) }}
+                                {{ form_label(form.birthDate) }}
+                                {{ form_widget(form.birthDate) }}
+                                {{ form_errors(form.birthDate) }}
                             </div>
                             <div class="col-md-4">
-                                {{ form_label(form.litrosLeitePorSemana) }}
-                                {{ form_widget(form.litrosLeitePorSemana) }}
-                                {{ form_errors(form.litrosLeitePorSemana) }}
+                                {{ form_label(form.milkLitersPerWeek) }}
+                                {{ form_widget(form.milkLitersPerWeek) }}
+                                {{ form_errors(form.milkLitersPerWeek) }}
                             </div>
                             <div class="col-md-4">
-                                {{ form_label(form.racaoPorSemana) }}
-                                {{ form_widget(form.racaoPorSemana) }}
-                                {{ form_errors(form.racaoPorSemana) }}
+                                {{ form_label(form.rationKgPerWeek) }}
+                                {{ form_widget(form.rationKgPerWeek) }}
+                                {{ form_errors(form.rationKgPerWeek) }}
                             </div>
                             <div class="col-md-4">
-                                {{ form_label(form.peso) }}
-                                {{ form_widget(form.peso) }}
-                                {{ form_errors(form.peso) }}
+                                {{ form_label(form.weightKg) }}
+                                {{ form_widget(form.weightKg) }}
+                                {{ form_errors(form.weightKg) }}
                             </div>
                             <div class="col-12">
-                                {{ form_label(form.fazenda) }}
-                                {{ form_widget(form.fazenda) }}
-                                {{ form_errors(form.fazenda) }}
+                                {{ form_label(form.farm) }}
+                                {{ form_widget(form.farm) }}
+                                {{ form_errors(form.farm) }}
                             </div>
                         </div>
                         <div class="d-flex gap-2 mt-4">

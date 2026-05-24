@@ -17,31 +17,31 @@ class CowType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('codigo', TextType::class, [
+            ->add('code', TextType::class, [
                 'label' => 'Código',
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Ex: BOV-001'],
             ])
-            ->add('litrosLeitePorSemana', NumberType::class, [
+            ->add('milkLitersPerWeek', NumberType::class, [
                 'label' => 'Leite (litros/semana)',
                 'scale' => 2,
                 'attr' => ['class' => 'form-control', 'placeholder' => '0.00'],
             ])
-            ->add('racaoPorSemana', NumberType::class, [
+            ->add('rationKgPerWeek', NumberType::class, [
                 'label' => 'Ração(kg/semana)',
                 'scale' => 2,
                 'attr' => ['class' => 'form-control', 'placeholder' => '0.00'],
             ])
-            ->add('peso', NumberType::class,[
+            ->add('weightKg', NumberType::class,[
                 'label' => 'Peso(kg)',
                 'scale' => 2,
                 'attr' => ['class' => 'form-control', 'placeholder' => '0.00'],
             ])
-            ->add('dataNascimento', DateType::class, [
+            ->add('birthDate', DateType::class, [
                 'label' => 'Data de Nascimento',
                 'widget' => 'single_text',
                 'attr' => ['class' => 'form-control'],
             ])
-            ->add('fazenda', EntityType::class, [
+            ->add('farm', EntityType::class, [
                 'class' => Farm::class,
                 'choice_label' => 'name',
                 'label' => 'Fazenda',
